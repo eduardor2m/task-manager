@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/eduardor2m/task-manager/src/api/handlers/dto/request"
+	"github.com/eduardor2m/task-manager/src/api/handlers/dto/response"
 	"github.com/eduardor2m/task-manager/src/core/domain/task"
 	"github.com/eduardor2m/task-manager/src/core/interfaces/primary"
 	"github.com/google/uuid"
@@ -48,7 +49,26 @@ func (instance TaskHandlers) GetTask(context echo.Context) error {
 }
 
 func (instance TaskHandlers) GetTasks(context echo.Context) error {
-	return context.JSON(200, "Hello World")
+	listTasks, err := instance.service.GetTasks()
+
+	if err != nil {
+		return err
+	}
+
+	tasksServices := []response.Task{}
+
+	for _, task := range listTasks {
+		tasksServices = append(tasksServices, response.Task{
+			ID:          task.ID(),
+			Title:       task.Title(),
+			Description: task.Description(),
+			Completed:   task.Completed(),
+			CreatedAt:   task.CreatedAt(),
+			UpdatedAt:   task.UpdatedAt(),
+		})
+	}
+
+	return context.JSON(200, tasksServices)
 }
 
 func (instance TaskHandlers) UpdateTask(context echo.Context) error {

@@ -1,6 +1,8 @@
 package sqlite
 
 import (
+	"time"
+
 	"github.com/eduardor2m/task-manager/src/core/domain/task"
 	"github.com/eduardor2m/task-manager/src/core/interfaces/repository"
 	"github.com/google/uuid"
@@ -46,7 +48,14 @@ func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {
 }
 
 func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
-	return nil, nil
+	listTasks := []*task.Task{}
+
+	currentTime := time.Now()
+	newTask, _ := task.NewBuilder().WithID(uuid.New()).WithTitle("title").WithCompleted(false).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).WithDescription("description").Build()
+
+	listTasks = append(listTasks, newTask)
+
+	return listTasks, nil
 }
 
 func (instance TaskSQLiteRepository) UpdateTask(taskInstance task.Task) (*task.Task, error) {

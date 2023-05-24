@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/eduardor2m/task-manager/src/core/domain/task"
@@ -15,32 +16,24 @@ type TaskSQLiteRepository struct {
 }
 
 func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task) (*uuid.UUID, error) {
-	conn, err := instance.connectorManager.getConnection()
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer instance.connectorManager.closeConnection(conn)
-
-	stmt, err := conn.Prepare("INSERT INTO tasks(id, title, description, completed, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?)")
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer stmt.Close()
-
-	_, err = stmt.Exec(taskInstance.ID(), taskInstance.Title(), taskInstance.Description(), taskInstance.Completed(), taskInstance.CreatedAt(), taskInstance.UpdatedAt())
-
-	if err != nil {
-		return nil, err
-	}
+	fmt.Println("to aqui")
+	fmt.Println(taskInstance)
 
 	taskID := taskInstance.ID()
+	taskTitle := taskInstance.Title()
+	taskDescription := taskInstance.Description()
+	taskCompleted := taskInstance.Completed()
+	taskCreatedAt := taskInstance.CreatedAt()
+	taskUpdatedAt := taskInstance.UpdatedAt()
+
+	fmt.Println(taskID)
+	fmt.Println(taskTitle)
+	fmt.Println(taskDescription)
+	fmt.Println(taskCompleted)
+	fmt.Println(taskCreatedAt)
+	fmt.Println(taskUpdatedAt)
 
 	return &taskID, nil
-
 }
 
 func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {

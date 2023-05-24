@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/eduardor2m/task-manager/src/api/handlers/dto/request"
 	"github.com/eduardor2m/task-manager/src/api/handlers/dto/response"
 	"github.com/eduardor2m/task-manager/src/core/domain/task"
@@ -14,33 +17,26 @@ type TaskHandlers struct {
 }
 
 func (instance TaskHandlers) CreateTask(context echo.Context) error {
-	var dto request.TaskDTO
+	var taskRequest request.TaskDTO
 
-	bindError := context.Bind(&dto)
+	if err := context.Bind(&taskRequest); err != nil {
 
-	if bindError != nil {
-		return bindError
+		return err
 	}
 
-	taskBuilder := task.NewBuilder()
+	fmt.Println(taskRequest)
 
-	taskBuilder.WithID(
-		uuid.New(),
-	).WithTitle(dto.Title).WithDescription(dto.Description).WithCompleted(false)
+	currentTime := time.Now()
 
-	taskInstance, validationError := taskBuilder.Build()
+	taskInstance, err := task.NewBuilder().WithID(uuid.New()).WithTitle("title").WithCompleted(false).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).WithDescription("description").Build()
 
-	if validationError != nil {
-		return validationError
+	if err != nil {
+		return err
 	}
 
-	task, createError := instance.service.CreateTask(*taskInstance)
+	taskID, _ := instance.service.CreateTask(*taskInstance)
 
-	if createError != nil {
-		return createError
-	}
-
-	return context.JSON(201, task)
+	return context.JSON(200, taskID)
 
 }
 

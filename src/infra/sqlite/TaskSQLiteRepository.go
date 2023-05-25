@@ -16,7 +16,7 @@ type TaskSQLiteRepository struct {
 }
 
 func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task) (*uuid.UUID, error) {
-	fmt.Println("to aqui")
+	fmt.Println("CreateTask Infra")
 	fmt.Println(taskInstance)
 
 	taskID := taskInstance.ID()

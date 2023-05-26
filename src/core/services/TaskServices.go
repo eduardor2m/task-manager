@@ -30,6 +30,10 @@ func (instance TaskServices) DeleteTask(id uuid.UUID) error {
 	return instance.taskRepository.DeleteTask(id)
 }
 
+func (instance TaskServices) DeleteTasks() error {
+	return instance.taskRepository.DeleteTasks()
+}
+
 func NewTaskServices(taskRepository repository.TaskLoader) TaskServices {
 	return TaskServices{taskRepository: taskRepository}
 }

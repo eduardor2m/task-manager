@@ -1,7 +1,7 @@
 package sqlite
 
 import (
-	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/eduardor2m/task-manager/src/core/domain/task"
@@ -24,12 +24,6 @@ func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task) (*uuid.U
 
 	defer db.Close()
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS tasks (id TEXT PRIMARY KEY, title TEXT, description TEXT, completed INTEGER, created_at TEXT, updated_at TEXT)")
-
-	if err != nil {
-		return nil, err
-	}
-
 	smtp, err := db.Prepare("INSERT INTO tasks(id, title, description, completed, created_at, updated_at) VALUES(?,?,?,?,?,?)")
 
 	if err != nil {
@@ -38,20 +32,15 @@ func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task) (*uuid.U
 
 	defer smtp.Close()
 
-	taskID := taskInstance.ID()
-	taskTitle := taskInstance.Title()
-	taskDescription := taskInstance.Description()
-	taskCompleted := taskInstance.Completed()
-	taskCreatedAt := taskInstance.CreatedAt()
-	taskUpdatedAt := taskInstance.UpdatedAt()
-
-	_, err = smtp.Exec(taskID, taskTitle, taskDescription, taskCompleted, taskCreatedAt, taskUpdatedAt)
+	_, err = smtp.Exec(taskInstance.ID(), taskInstance.Title(), taskInstance.Description(), taskInstance.Completed(), taskInstance.CreatedAt(), taskInstance.UpdatedAt())
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &taskID, nil
+	taskId := taskInstance.ID()
+
+	return &taskId, nil
 }
 
 func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {
@@ -62,12 +51,6 @@ func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {
 	}
 
 	defer db.Close()
-
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS tasks (id TEXT PRIMARY KEY, title TEXT, description TEXT, completed INTEGER, created_at TEXT, updated_at TEXT)")
-
-	if err != nil {
-		return nil, err
-	}
 
 	smtp, err := db.Prepare("SELECT id, title, description, completed, created_at, updated_at FROM tasks WHERE id = ?")
 
@@ -80,13 +63,15 @@ func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {
 	var taskID uuid.UUID
 	var taskTitle string
 	var taskDescription string
-	var taskCompleted bool
+	var taskCompleted string
 	var taskCreatedAt time.Time
 	var taskUpdatedAt time.Time
 
-	_ = smtp.QueryRow(id).Scan(&taskID, &taskTitle, &taskDescription, &taskCompleted, &taskCreatedAt, &taskUpdatedAt)
+	smtp.QueryRow(id).Scan(&taskID, &taskTitle, &taskDescription, &taskCompleted, &taskCreatedAt, &taskUpdatedAt)
 
-	newTask, _ := task.NewBuilder().WithID(taskID).WithTitle(taskTitle).WithCompleted(taskCompleted).WithCreatedAt(&taskCreatedAt).WithUpdatedAt(&taskUpdatedAt).WithDescription(taskDescription).Build()
+	taskCompletedBool, _ := strconv.ParseBool(taskCompleted)
+
+	newTask, _ := task.NewBuilder().WithID(taskID).WithTitle(taskTitle).WithCompleted(taskCompletedBool).WithCreatedAt(&taskCreatedAt).WithUpdatedAt(&taskUpdatedAt).WithDescription(taskDescription).Build()
 
 	return newTask, nil
 }
@@ -94,19 +79,11 @@ func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {
 func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
 	db, err := instance.getConnection()
 
-	fmt.Println("GetTasks")
-
 	if err != nil {
 		return nil, err
 	}
 
 	defer db.Close()
-
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS tasks (id TEXT PRIMARY KEY, title TEXT, description TEXT, completed INTEGER, created_at TEXT, updated_at TEXT)")
-
-	if err != nil {
-		return nil, err
-	}
 
 	smtp, err := db.Prepare("SELECT id, title, description, completed, created_at, updated_at FROM tasks")
 
@@ -121,8 +98,6 @@ func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("gettasks2")
 
 	defer rows.Close()
 
@@ -157,12 +132,6 @@ func (instance TaskSQLiteRepository) UpdateTask(taskInstance task.Task) (*task.T
 
 	defer db.Close()
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS tasks (id TEXT PRIMARY KEY, title TEXT, description TEXT, completed INTEGER, created_at TEXT, updated_at TEXT)")
-
-	if err != nil {
-		return nil, err
-	}
-
 	smtp, err := db.Prepare("UPDATE tasks SET title = ?, description = ?, completed = ?, updated_at = ? WHERE id = ?")
 
 	if err != nil {
@@ -196,12 +165,6 @@ func (instance TaskSQLiteRepository) DeleteTask(id uuid.UUID) error {
 
 	defer db.Close()
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS tasks (id TEXT PRIMARY KEY, title TEXT, description TEXT, completed INTEGER, created_at TEXT, updated_at TEXT)")
-
-	if err != nil {
-		return err
-	}
-
 	smtp, err := db.Prepare("DELETE FROM tasks WHERE id = ?")
 
 	if err != nil {
@@ -211,6 +174,32 @@ func (instance TaskSQLiteRepository) DeleteTask(id uuid.UUID) error {
 	defer smtp.Close()
 
 	_, err = smtp.Exec(id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (instance TaskSQLiteRepository) DeleteTasks() error {
+	db, err := instance.getConnection()
+
+	if err != nil {
+		return err
+	}
+
+	defer db.Close()
+
+	smtp, err := db.Prepare("DELETE FROM tasks")
+
+	if err != nil {
+		return err
+	}
+
+	defer smtp.Close()
+
+	_, err = smtp.Exec()
 
 	if err != nil {
 		return err

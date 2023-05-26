@@ -57,8 +57,6 @@ func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task) (*uuid.U
 func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {
 	db, err := instance.getConnection()
 
-	fmt.Println("GetTask")
-
 	if err != nil {
 		return nil, err
 	}
@@ -87,10 +85,6 @@ func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {
 	var taskUpdatedAt time.Time
 
 	_ = smtp.QueryRow(id).Scan(&taskID, &taskTitle, &taskDescription, &taskCompleted, &taskCreatedAt, &taskUpdatedAt)
-	fmt.Println(taskID, taskTitle, taskDescription, taskCompleted, taskCreatedAt, taskUpdatedAt)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	newTask, _ := task.NewBuilder().WithID(taskID).WithTitle(taskTitle).WithCompleted(taskCompleted).WithCreatedAt(&taskCreatedAt).WithUpdatedAt(&taskUpdatedAt).WithDescription(taskDescription).Build()
 
@@ -99,6 +93,8 @@ func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {
 
 func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
 	db, err := instance.getConnection()
+
+	fmt.Println("GetTasks")
 
 	if err != nil {
 		return nil, err
@@ -126,6 +122,8 @@ func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
 		return nil, err
 	}
 
+	fmt.Println("gettasks2")
+
 	defer rows.Close()
 
 	var tasks []*task.Task
@@ -138,15 +136,12 @@ func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
 		var taskCreatedAt time.Time
 		var taskUpdatedAt time.Time
 
-		err = rows.Scan(&taskID, &taskTitle, &taskDescription, &taskCompleted, &taskCreatedAt, &taskUpdatedAt)
-
-		if err != nil {
-			return nil, err
-		}
+		_ = rows.Scan(&taskID, &taskTitle, &taskDescription, &taskCompleted, &taskCreatedAt, &taskUpdatedAt)
 
 		newTask, _ := task.NewBuilder().WithID(taskID).WithTitle(taskTitle).WithCompleted(taskCompleted).WithCreatedAt(&taskCreatedAt).WithUpdatedAt(&taskUpdatedAt).WithDescription(taskDescription).Build()
 
 		tasks = append(tasks, newTask)
+
 	}
 
 	return tasks, nil
@@ -189,6 +184,7 @@ func (instance TaskSQLiteRepository) UpdateTask(taskInstance task.Task) (*task.T
 	}
 
 	return &taskInstance, nil
+
 }
 
 func (instance TaskSQLiteRepository) DeleteTask(id uuid.UUID) error {

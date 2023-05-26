@@ -11,4 +11,5 @@ type TaskLoader interface {
 	GetTasks() ([]*task.Task, error)
 	UpdateTask(task task.Task) (*task.Task, error)
 	DeleteTask(id uuid.UUID) error
+	DeleteTasks() error
 }

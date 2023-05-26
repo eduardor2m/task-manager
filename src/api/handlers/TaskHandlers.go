@@ -40,20 +40,22 @@ func (instance TaskHandlers) CreateTask(context echo.Context) error {
 func (instance TaskHandlers) GetTask(context echo.Context) error {
 	id := uuid.MustParse(context.Param("id"))
 
-	dataTask, err := instance.service.GetTask(id)
+	responseTask, err := instance.service.GetTask(id)
 
 	if err != nil {
 		return err
 	}
 
-	return context.JSON(200, response.Task{
-		ID:          dataTask.ID(),
-		Title:       dataTask.Title(),
-		Description: dataTask.Description(),
-		Completed:   dataTask.Completed(),
-		CreatedAt:   dataTask.CreatedAt(),
-		UpdatedAt:   dataTask.UpdatedAt(),
-	})
+	formattedTask := response.Task{
+		ID:          responseTask.ID(),
+		Title:       responseTask.Title(),
+		Description: responseTask.Description(),
+		Completed:   responseTask.Completed(),
+		CreatedAt:   responseTask.CreatedAt(),
+		UpdatedAt:   responseTask.UpdatedAt(),
+	}
+
+	return context.JSON(200, formattedTask)
 }
 
 func (instance TaskHandlers) GetTasks(context echo.Context) error {
@@ -125,8 +127,22 @@ func (instance TaskHandlers) DeleteTask(context echo.Context) error {
 		return err
 	}
 
-	return context.JSON(200, nil)
+	message := "Task deleted successfully"
 
+	return context.JSON(200, message)
+
+}
+
+func (instance TaskHandlers) DeleteTasks(context echo.Context) error {
+	err := instance.service.DeleteTasks()
+
+	if err != nil {
+		return err
+	}
+
+	message := "Tasks deleted successfully"
+
+	return context.JSON(200, message)
 }
 
 func NewTaskHandlers(service primary.TaskManager) *TaskHandlers {

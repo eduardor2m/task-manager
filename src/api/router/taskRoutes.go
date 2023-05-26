@@ -15,4 +15,5 @@ func loadTaskRoutes(group *echo.Group) {
 	taskGroup.POST("", taskHandlers.CreateTask)
 	taskGroup.PUT("/:id", taskHandlers.UpdateTask)
 	taskGroup.DELETE("/:id", taskHandlers.DeleteTask)
+	taskGroup.DELETE("", taskHandlers.DeleteTasks)
 }

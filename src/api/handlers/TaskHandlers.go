@@ -103,7 +103,16 @@ func (instance TaskHandlers) UpdateTask(context echo.Context) error {
 
 	}
 
-	return context.JSON(200, data)
+	dataFormatted := response.Task{
+		ID:          data.ID(),
+		Title:       data.Title(),
+		Description: data.Description(),
+		Completed:   data.Completed(),
+		CreatedAt:   data.CreatedAt(),
+		UpdatedAt:   data.UpdatedAt(),
+	}
+
+	return context.JSON(200, dataFormatted)
 
 }
 

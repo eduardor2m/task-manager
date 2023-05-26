@@ -44,7 +44,7 @@ func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
 	listTasks := []*task.Task{}
 
 	currentTime := time.Now()
-	newTask, _ := task.NewBuilder().WithID(uuid.New()).WithTitle("title").WithCompleted(false).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).WithDescription("description").Build()
+	newTask, _ := task.NewBuilder().WithID(uuid.New()).WithTitle("Eduardo").WithCompleted(true).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).WithDescription("desc dudu").Build()
 
 	listTasks = append(listTasks, newTask)
 

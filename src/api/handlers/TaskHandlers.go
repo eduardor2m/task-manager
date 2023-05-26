@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/eduardor2m/task-manager/src/api/handlers/dto/request"
@@ -24,11 +23,9 @@ func (instance TaskHandlers) CreateTask(context echo.Context) error {
 		return err
 	}
 
-	fmt.Println(taskRequest)
-
 	currentTime := time.Now()
 
-	taskInstance, err := task.NewBuilder().WithID(uuid.New()).WithTitle("title").WithCompleted(false).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).WithDescription("description").Build()
+	taskInstance, err := task.NewBuilder().WithID(uuid.New()).WithTitle(taskRequest.Title).WithCompleted(taskRequest.Completed).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).WithDescription(taskRequest.Description).Build()
 
 	if err != nil {
 		return err
@@ -41,7 +38,22 @@ func (instance TaskHandlers) CreateTask(context echo.Context) error {
 }
 
 func (instance TaskHandlers) GetTask(context echo.Context) error {
-	return nil
+	id := uuid.MustParse(context.Param("id"))
+
+	dataTask, err := instance.service.GetTask(id)
+
+	if err != nil {
+		return err
+	}
+
+	return context.JSON(200, response.Task{
+		ID:          dataTask.ID(),
+		Title:       dataTask.Title(),
+		Description: dataTask.Description(),
+		Completed:   dataTask.Completed(),
+		CreatedAt:   dataTask.CreatedAt(),
+		UpdatedAt:   dataTask.UpdatedAt(),
+	})
 }
 
 func (instance TaskHandlers) GetTasks(context echo.Context) error {
@@ -68,11 +80,44 @@ func (instance TaskHandlers) GetTasks(context echo.Context) error {
 }
 
 func (instance TaskHandlers) UpdateTask(context echo.Context) error {
-	return nil
+	dataTask := request.TaskDTO{}
+
+	if err := context.Bind(&dataTask); err != nil {
+		return err
+	}
+
+	id := uuid.MustParse(context.Param("id"))
+
+	currentTime := time.Now()
+
+	taskInstance, err := task.NewBuilder().WithID(id).WithTitle(dataTask.Title).WithCompleted(dataTask.Completed).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).WithDescription(dataTask.Description).Build()
+
+	if err != nil {
+		return err
+	}
+
+	data, err := instance.service.UpdateTask(*taskInstance)
+
+	if err != nil {
+		return err
+
+	}
+
+	return context.JSON(200, data)
+
 }
 
 func (instance TaskHandlers) DeleteTask(context echo.Context) error {
-	return nil
+	id := uuid.MustParse(context.Param("id"))
+
+	err := instance.service.DeleteTask(id)
+
+	if err != nil {
+		return err
+	}
+
+	return context.JSON(200, nil)
+
 }
 
 func NewTaskHandlers(service primary.TaskManager) *TaskHandlers {

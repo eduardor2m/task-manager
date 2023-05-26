@@ -11,8 +11,8 @@ func loadTaskRoutes(group *echo.Group) {
 	taskHandlers := dicontainer.GetTaskHandlers()
 
 	taskGroup.GET("", taskHandlers.GetTasks)
-	// taskGroup.GET("/:id", getTask)
+	taskGroup.GET("/:id", taskHandlers.GetTask)
 	taskGroup.POST("", taskHandlers.CreateTask)
-	// taskGroup.PUT("/:id", updateTask)
-	// taskGroup.DELETE("/:id", deleteTask)
+	taskGroup.PUT("/:id", taskHandlers.UpdateTask)
+	taskGroup.DELETE("/:id", taskHandlers.DeleteTask)
 }

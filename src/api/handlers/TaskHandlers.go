@@ -18,8 +18,9 @@ type TaskHandlers struct {
 func (instance TaskHandlers) CreateTask(context echo.Context) error {
 	var taskRequest request.TaskDTO
 
-	if err := context.Bind(&taskRequest); err != nil {
+	err := context.Bind(&taskRequest)
 
+	if err != nil {
 		return err
 	}
 
@@ -34,7 +35,6 @@ func (instance TaskHandlers) CreateTask(context echo.Context) error {
 	taskID, _ := instance.service.CreateTask(*taskInstance)
 
 	return context.JSON(200, taskID)
-
 }
 
 func (instance TaskHandlers) GetTask(context echo.Context) error {

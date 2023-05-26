@@ -24,12 +24,6 @@ func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task) (*uuid.U
 
 	defer db.Close()
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS tasks (id TEXT PRIMARY KEY, title TEXT, description TEXT, completed INTEGER, created_at TEXT, updated_at TEXT)")
-
-	if err != nil {
-		return nil, err
-	}
-
 	smtp, err := db.Prepare("INSERT INTO tasks(id, title, description, completed, created_at, updated_at) VALUES(?,?,?,?,?,?)")
 
 	if err != nil {
@@ -38,20 +32,15 @@ func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task) (*uuid.U
 
 	defer smtp.Close()
 
-	taskID := taskInstance.ID()
-	taskTitle := taskInstance.Title()
-	taskDescription := taskInstance.Description()
-	taskCompleted := taskInstance.Completed()
-	taskCreatedAt := taskInstance.CreatedAt()
-	taskUpdatedAt := taskInstance.UpdatedAt()
-
-	_, err = smtp.Exec(taskID, taskTitle, taskDescription, taskCompleted, taskCreatedAt, taskUpdatedAt)
+	_, err = smtp.Exec(taskInstance.ID(), taskInstance.Title(), taskInstance.Description(), taskInstance.Completed(), taskInstance.CreatedAt(), taskInstance.UpdatedAt())
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &taskID, nil
+	taskId := taskInstance.ID()
+
+	return &taskId, nil
 }
 
 func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {

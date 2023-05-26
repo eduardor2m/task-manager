@@ -22,6 +22,12 @@ func (dcm DatabaseConnectionManager) getConnection() (*sql.DB, error) {
 		return nil, err
 	}
 
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS tasks (id TEXT PRIMARY KEY, title TEXT, description TEXT, completed INTEGER, created_at TEXT, updated_at TEXT)")
+
+	if err != nil {
+		return nil, err
+	}
+
 	db.SetMaxOpenConns(10)
 
 	return db, nil

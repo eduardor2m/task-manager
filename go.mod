@@ -6,6 +6,8 @@ require github.com/labstack/echo/v4 v4.10.2
 
 require github.com/mattn/go-sqlite3 v1.14.16
 
+require github.com/jmoiron/sqlx v1.3.5 // indirect
+
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

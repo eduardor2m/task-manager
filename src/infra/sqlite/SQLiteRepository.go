@@ -1,28 +1,22 @@
 package sqlite
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 type connectorManager interface {
-	getConnection() (*sql.DB, error)
-	closeConnection(conn *sql.DB)
+	getConnection() (*sqlx.DB, error)
+	closeConnection(conn *sqlx.DB)
 }
 
 var _ connectorManager = (*DatabaseConnectionManager)(nil)
 
 type DatabaseConnectionManager struct{}
 
-func (dcm DatabaseConnectionManager) getConnection() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", "./task-manager.db")
-
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS tasks (id TEXT PRIMARY KEY, title TEXT, description TEXT, completed INTEGER, created_at TEXT, updated_at TEXT)")
+func (dcm DatabaseConnectionManager) getConnection() (*sqlx.DB, error) {
+	db, err := sqlx.Open("sqlite3", "./task-manager.db")
 
 	if err != nil {
 		return nil, err
@@ -33,6 +27,6 @@ func (dcm DatabaseConnectionManager) getConnection() (*sql.DB, error) {
 	return db, nil
 }
 
-func (dcm DatabaseConnectionManager) closeConnection(conn *sql.DB) {
-	conn.Close()
+func (dcm DatabaseConnectionManager) closeConnection(conn *sqlx.DB) {
+	conn.Close().Error()
 }

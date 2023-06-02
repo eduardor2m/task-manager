@@ -2,17 +2,17 @@
 // versions:
 //   sqlc v1.18.0
 
-package db
+package bridge
 
 import (
-	"time"
+	"github.com/google/uuid"
 )
 
 type Task struct {
-	ID          int64
+	ID          uuid.UUID
 	Title       string
 	Description string
-	Completed   int64
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	Completed   bool
+	CreatedAt   interface{}
+	UpdatedAt   interface{}
 }

@@ -1,6 +1,8 @@
-package sqlite
+package postgres
 
 import (
+	"context"
+	"github.com/eduardor2m/task-manager/src/infra/postgres/bridge"
 	"strconv"
 	"time"
 
@@ -22,25 +24,24 @@ func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task) (*uuid.U
 		return nil, err
 	}
 
-	defer db.Close()
+	defer instance.closeConnection(db)
 
-	smtp, err := db.Prepare("INSERT INTO tasks(id, title, description, completed, created_at, updated_at) VALUES(?,?,?,?,?,?)")
+	ctx := context.Background()
 
-	if err != nil {
-		return nil, err
-	}
+	queries := bridge.New(db)
 
-	defer smtp.Close()
+	err = queries.CreateTask(ctx, bridge.CreateTaskParams{
+		Title:       taskInstance.Title(),
+		Description: taskInstance.Description(),
+		Completed:   taskInstance.Completed(),
+		CreatedAt:   taskInstance.CreatedAt(),
+		UpdatedAt:   taskInstance.UpdatedAt(),
+	})
 
-	_, err = smtp.Exec(taskInstance.ID(), taskInstance.Title(), taskInstance.Description(), taskInstance.Completed(), taskInstance.CreatedAt(), taskInstance.UpdatedAt())
+	lasInsertID := taskInstance.ID()
 
-	if err != nil {
-		return nil, err
-	}
+	return &lasInsertID, nil
 
-	taskId := taskInstance.ID()
-
-	return &taskId, nil
 }
 
 func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {

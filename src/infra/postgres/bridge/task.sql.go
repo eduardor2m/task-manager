@@ -7,25 +7,28 @@ package bridge
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 const createTask = `-- name: CreateTask :exec
 
-INSERT INTO task (title, description, completed, created_at, updated_at) VALUES ($1, $2, $3, $4, $5 )
+INSERT INTO task (id, title, description, completed, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, title, description, completed, created_at, updated_at
 `
 
 type CreateTaskParams struct {
+	ID          uuid.UUID
 	Title       string
 	Description string
 	Completed   bool
-	CreatedAt   interface{}
-	UpdatedAt   interface{}
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) error {
 	_, err := q.db.ExecContext(ctx, createTask,
+		arg.ID,
 		arg.Title,
 		arg.Description,
 		arg.Completed,
@@ -118,7 +121,7 @@ type UpdateTaskParams struct {
 	Title       string
 	Description string
 	Completed   bool
-	UpdatedAt   interface{}
+	UpdatedAt   time.Time
 	ID          uuid.UUID
 }
 

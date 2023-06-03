@@ -2,9 +2,8 @@ package postgres
 
 import (
 	"context"
+
 	"github.com/eduardor2m/task-manager/src/infra/postgres/bridge"
-	"strconv"
-	"time"
 
 	"github.com/eduardor2m/task-manager/src/core/domain/task"
 	"github.com/eduardor2m/task-manager/src/core/interfaces/repository"
@@ -30,94 +29,75 @@ func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task) (*uuid.U
 
 	queries := bridge.New(db)
 
-	err = queries.CreateTask(ctx, bridge.CreateTaskParams{
+	taskFormated := bridge.CreateTaskParams{
+		ID:          taskInstance.ID(),
 		Title:       taskInstance.Title(),
 		Description: taskInstance.Description(),
 		Completed:   taskInstance.Completed(),
-		CreatedAt:   taskInstance.CreatedAt(),
-		UpdatedAt:   taskInstance.UpdatedAt(),
-	})
+		CreatedAt:   *taskInstance.CreatedAt(),
+		UpdatedAt:   *taskInstance.UpdatedAt(),
+	}
 
-	lasInsertID := taskInstance.ID()
+	err = queries.CreateTask(ctx, taskFormated)
 
-	return &lasInsertID, nil
+	if err != nil {
+		return nil, err
+	}
+
+	idLastInsert := taskFormated.ID
+
+	return &idLastInsert, nil
 
 }
 
 func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {
-	db, err := instance.getConnection()
+	conn, err := instance.getConnection()
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer db.Close()
+	defer instance.closeConnection(conn)
 
-	smtp, err := db.Prepare("SELECT id, title, description, completed, created_at, updated_at FROM tasks WHERE id = ?")
+	ctx := context.Background()
+
+	queries := bridge.New(conn)
+
+	taskFormated, err := queries.GetTask(ctx, id)
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer smtp.Close()
+	taskInstance, _ := task.NewBuilder().WithID(taskFormated.ID).WithTitle(taskFormated.Title).WithCompleted(taskFormated.Completed).WithCreatedAt(&taskFormated.CreatedAt).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
 
-	var taskID uuid.UUID
-	var taskTitle string
-	var taskDescription string
-	var taskCompleted string
-	var taskCreatedAt time.Time
-	var taskUpdatedAt time.Time
-
-	smtp.QueryRow(id).Scan(&taskID, &taskTitle, &taskDescription, &taskCompleted, &taskCreatedAt, &taskUpdatedAt)
-
-	taskCompletedBool, _ := strconv.ParseBool(taskCompleted)
-
-	newTask, _ := task.NewBuilder().WithID(taskID).WithTitle(taskTitle).WithCompleted(taskCompletedBool).WithCreatedAt(&taskCreatedAt).WithUpdatedAt(&taskUpdatedAt).WithDescription(taskDescription).Build()
-
-	return newTask, nil
+	return taskInstance, nil
 }
 
 func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
-	db, err := instance.getConnection()
+	conn, err := instance.getConnection()
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer db.Close()
+	defer instance.closeConnection(conn)
 
-	smtp, err := db.Prepare("SELECT id, title, description, completed, created_at, updated_at FROM tasks")
+	ctx := context.Background()
 
-	if err != nil {
-		return nil, err
-	}
+	queries := bridge.New(conn)
 
-	defer smtp.Close()
-
-	rows, err := smtp.Query()
+	tasksFormated, err := queries.GetTasks(ctx)
 
 	if err != nil {
 		return nil, err
 	}
-
-	defer rows.Close()
 
 	var tasks []*task.Task
 
-	for rows.Next() {
-		var taskID uuid.UUID
-		var taskTitle string
-		var taskDescription string
-		var taskCompleted bool
-		var taskCreatedAt time.Time
-		var taskUpdatedAt time.Time
-
-		_ = rows.Scan(&taskID, &taskTitle, &taskDescription, &taskCompleted, &taskCreatedAt, &taskUpdatedAt)
-
-		newTask, _ := task.NewBuilder().WithID(taskID).WithTitle(taskTitle).WithCompleted(taskCompleted).WithCreatedAt(&taskCreatedAt).WithUpdatedAt(&taskUpdatedAt).WithDescription(taskDescription).Build()
-
-		tasks = append(tasks, newTask)
-
+	for _, taskFormated := range tasksFormated {
+		taskInstance, _ := task.NewBuilder().WithID(taskFormated.ID).WithTitle(taskFormated.Title).WithCompleted(taskFormated.Completed).WithCreatedAt(&taskFormated.CreatedAt).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
+		tasks = append(tasks, taskInstance)
 	}
 
 	return tasks, nil
@@ -125,82 +105,75 @@ func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
 }
 
 func (instance TaskSQLiteRepository) UpdateTask(taskInstance task.Task) (*task.Task, error) {
-	db, err := instance.getConnection()
+	conn, err := instance.getConnection()
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer db.Close()
+	defer instance.closeConnection(conn)
 
-	smtp, err := db.Prepare("UPDATE tasks SET title = ?, description = ?, completed = ?, updated_at = ? WHERE id = ?")
+	ctx := context.Background()
+
+	queries := bridge.New(conn)
+
+	taskFormated := bridge.UpdateTaskParams{
+		ID:          taskInstance.ID(),
+		Title:       taskInstance.Title(),
+		Description: taskInstance.Description(),
+		Completed:   taskInstance.Completed(),
+		UpdatedAt:   *taskInstance.UpdatedAt(),
+	}
+
+	err = queries.UpdateTask(ctx, taskFormated)
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer smtp.Close()
+	taskUpdated, _ := task.NewBuilder().WithID(taskFormated.ID).WithTitle(taskFormated.Title).WithCompleted(taskFormated.Completed).WithCreatedAt(nil).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
 
-	taskID := taskInstance.ID()
-	taskTitle := taskInstance.Title()
-	taskDescription := taskInstance.Description()
-	taskCompleted := taskInstance.Completed()
-	taskUpdatedAt := taskInstance.UpdatedAt()
-
-	_, err = smtp.Exec(taskTitle, taskDescription, taskCompleted, taskUpdatedAt, taskID)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &taskInstance, nil
+	return taskUpdated, nil
 
 }
 
 func (instance TaskSQLiteRepository) DeleteTask(id uuid.UUID) error {
-	db, err := instance.getConnection()
+	conn, err := instance.getConnection()
 
 	if err != nil {
 		return err
 	}
 
-	defer db.Close()
+	defer instance.closeConnection(conn)
 
-	smtp, err := db.Prepare("DELETE FROM tasks WHERE id = ?")
+	ctx := context.Background()
 
-	if err != nil {
-		return err
-	}
+	queries := bridge.New(conn)
 
-	defer smtp.Close()
-
-	_, err = smtp.Exec(id)
+	err = queries.DeleteTask(ctx, id)
 
 	if err != nil {
 		return err
 	}
 
 	return nil
+
 }
 
 func (instance TaskSQLiteRepository) DeleteTasks() error {
-	db, err := instance.getConnection()
+	conn, err := instance.getConnection()
 
 	if err != nil {
 		return err
 	}
 
-	defer db.Close()
+	defer instance.closeConnection(conn)
 
-	smtp, err := db.Prepare("DELETE FROM tasks")
+	ctx := context.Background()
 
-	if err != nil {
-		return err
-	}
+	queries := bridge.New(conn)
 
-	defer smtp.Close()
-
-	_, err = smtp.Exec()
+	err = queries.DeleteAllTasks(ctx)
 
 	if err != nil {
 		return err

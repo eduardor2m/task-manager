@@ -5,6 +5,8 @@
 package bridge
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -13,6 +15,6 @@ type Task struct {
 	Title       string
 	Description string
 	Completed   bool
-	CreatedAt   interface{}
-	UpdatedAt   interface{}
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }

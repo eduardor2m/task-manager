@@ -1,6 +1,6 @@
 -- name: CreateTask :exec
 
-INSERT INTO task (title, description, completed, created_at, updated_at) VALUES ($1, $2, $3, $4, $5 );
+INSERT INTO task (id, title, description, completed, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;
 
 -- name: GetTask :one
 

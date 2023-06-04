@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"net/http"
 	"time"
 
+	"github.com/eduardor2m/task-manager/src/api/handlers/dto"
 	"github.com/eduardor2m/task-manager/src/api/handlers/dto/request"
 	"github.com/eduardor2m/task-manager/src/api/handlers/dto/response"
 	"github.com/eduardor2m/task-manager/src/core/domain/task"
@@ -29,7 +31,11 @@ func (instance TaskHandlers) CreateTask(context echo.Context) error {
 	taskInstance, err := task.NewBuilder().WithID(uuid.New()).WithTitle(taskRequest.Title).WithCompleted(taskRequest.Completed).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).WithDescription(taskRequest.Description).Build()
 
 	if err != nil {
-		return err
+		errMessage := dto.ErrorMessage{
+			Message: err.Error(),
+		}
+
+		return context.JSON(http.StatusBadRequest, errMessage)
 	}
 
 	taskID, _ := instance.service.CreateTask(*taskInstance)
@@ -46,14 +52,7 @@ func (instance TaskHandlers) GetTask(context echo.Context) error {
 		return err
 	}
 
-	formattedTask := response.Task{
-		ID:          responseTask.ID(),
-		Title:       responseTask.Title(),
-		Description: responseTask.Description(),
-		Completed:   responseTask.Completed(),
-		CreatedAt:   responseTask.CreatedAt(),
-		UpdatedAt:   responseTask.UpdatedAt(),
-	}
+	formattedTask := response.NewTask(*responseTask)
 
 	return context.JSON(200, formattedTask)
 }
@@ -68,14 +67,7 @@ func (instance TaskHandlers) GetTasks(context echo.Context) error {
 	tasksServices := []response.Task{}
 
 	for _, task := range listTasks {
-		tasksServices = append(tasksServices, response.Task{
-			ID:          task.ID(),
-			Title:       task.Title(),
-			Description: task.Description(),
-			Completed:   task.Completed(),
-			CreatedAt:   task.CreatedAt(),
-			UpdatedAt:   task.UpdatedAt(),
-		})
+		tasksServices = append(tasksServices, *response.NewTask(*task))
 	}
 
 	return context.JSON(200, tasksServices)

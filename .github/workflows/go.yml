@@ -11,7 +11,7 @@ on:
 
 jobs:
 
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -20,9 +20,21 @@ jobs:
       uses: actions/setup-go@v3
       with:
         go-version: 1.20.4
-        
-    - name: Test
-      run: go test -v ./...
+      
+    - name: Build-DB
+      run: docker-compose build
+      
+    - name: Create-DB
+      run: docker-compose up -d
 
+    - name: Test
+      run: go test ./... -v
+      
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
     - name: Build
-      run: go build -v ./...
+      run: go build -v ./src/api/app/main.go

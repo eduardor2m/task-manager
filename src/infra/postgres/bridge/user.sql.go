@@ -14,11 +14,16 @@ import (
 
 const signin = `-- name: Signin :one
 
-SELECT id, username, email, password, created_at, updated_at FROM "user" WHERE email = $1 LIMIT 1
+SELECT id, username, email, password, created_at, updated_at FROM "user" WHERE email = $1 and password = $2 LIMIT 1
 `
 
-func (q *Queries) Signin(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRowContext(ctx, signin, email)
+type SigninParams struct {
+	Email    string
+	Password string
+}
+
+func (q *Queries) Signin(ctx context.Context, arg SigninParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, signin, arg.Email, arg.Password)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -33,11 +38,12 @@ func (q *Queries) Signin(ctx context.Context, email string) (User, error) {
 
 const signup = `-- name: Signup :one
 
-INSERT INTO "user" (id, email, password, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING id, username, email, password, created_at, updated_at
+INSERT INTO "user" (id, username, email, password, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, username, email, password, created_at, updated_at
 `
 
 type SignupParams struct {
 	ID        uuid.UUID
+	Username  string
 	Email     string
 	Password  string
 	CreatedAt time.Time
@@ -47,6 +53,7 @@ type SignupParams struct {
 func (q *Queries) Signup(ctx context.Context, arg SignupParams) (User, error) {
 	row := q.db.QueryRowContext(ctx, signup,
 		arg.ID,
+		arg.Username,
 		arg.Email,
 		arg.Password,
 		arg.CreatedAt,

@@ -7,5 +7,5 @@ import (
 
 type UserManager interface {
 	SignUp(user user.User) (*uuid.UUID, error)
-	SignIn(username, password string) (*uuid.UUID, error)
+	SignIn(username, password string) (*string, error)
 }

@@ -7,5 +7,5 @@ import (
 
 type UserLoader interface {
 	SignUp(user user.User) (*uuid.UUID, error)
-	SignIn(email string, password string) (*uuid.UUID, error)
+	SignIn(email string, password string) (*string, error)
 }

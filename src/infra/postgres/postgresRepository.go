@@ -44,7 +44,7 @@ func (dcm DatabaseConnectionManager) getConnection() (*sqlx.DB, error) {
 	_, err = conn.Exec(`
 		CREATE TABLE IF NOT EXISTS "user" (
 			id UUID PRIMARY KEY,
-			name VARCHAR(255) NOT NULL,
+			username VARCHAR(255) NOT NULL,
 			email VARCHAR(255) NOT NULL,
 			password VARCHAR(255) NOT NULL,
 			created_at TIMESTAMP NOT NULL,

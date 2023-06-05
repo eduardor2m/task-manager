@@ -18,7 +18,6 @@ type UserSQLiteRepository struct {
 }
 
 func (instance UserSQLiteRepository) SignUp(userInstance user.User) (*uuid.UUID, error) {
-	fmt.Println(userInstance)
 	conn, err := instance.connectorManager.getConnection()
 	if err != nil {
 		return nil, err
@@ -31,6 +30,7 @@ func (instance UserSQLiteRepository) SignUp(userInstance user.User) (*uuid.UUID,
 
 	userFormated := bridge.SignupParams{
 		ID:        userInstance.ID(),
+		Username:  userInstance.Username(),
 		Email:     userInstance.Email(),
 		Password:  userInstance.Password(),
 		CreatedAt: *userInstance.CreatedAt(),
@@ -39,7 +39,7 @@ func (instance UserSQLiteRepository) SignUp(userInstance user.User) (*uuid.UUID,
 
 	userDB, err := queries.Signup(ctx, userFormated)
 
-	fmt.Println(userDB)
+	fmt.Println(err)
 
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (instance UserSQLiteRepository) SignUp(userInstance user.User) (*uuid.UUID,
 
 }
 
-func (instance UserSQLiteRepository) SignIn(email string, password string) (*uuid.UUID, error) {
+func (instance UserSQLiteRepository) SignIn(email string, password string) (*string, error) {
 	conn, err := instance.connectorManager.getConnection()
 	if err != nil {
 		return nil, err
@@ -62,15 +62,22 @@ func (instance UserSQLiteRepository) SignIn(email string, password string) (*uui
 
 	queries := bridge.New(conn)
 
-	userDB, err := queries.Signin(ctx, email)
+	loginParams := bridge.SigninParams{
+		Email:    email,
+		Password: password,
+	}
+
+	userDB, err := queries.Signin(ctx, loginParams)
 
 	if err != nil {
 		return nil, err
 	}
 
-	idLastInsert := userDB.ID
+	idDB := userDB.ID
 
-	return &idLastInsert, nil
+	idDBString := idDB.String()
+
+	return &idDBString, nil
 }
 
 func NewUserSQLiteRepository(connectorManager connectorManager) UserSQLiteRepository {

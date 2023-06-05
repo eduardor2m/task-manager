@@ -1,7 +1,7 @@
 -- name: Signup :one
 
-INSERT INTO "user" (id, email, password, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING *;
+INSERT INTO "user" (id, username, email, password, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;
 
 -- name: Signin :one
 
-SELECT * FROM "user" WHERE email = $1 LIMIT 1;
+SELECT * FROM "user" WHERE email = $1 and password = $2 LIMIT 1;

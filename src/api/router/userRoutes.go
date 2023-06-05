@@ -11,5 +11,5 @@ func loadUserRoutes(group *echo.Group) {
 	userHandlers := dicontainer.GetUserHandlers()
 
 	userGroup.POST("/signup", userHandlers.SignUp)
-	userGroup.POST("/login", userHandlers.SignIn)
+	userGroup.POST("/signin", userHandlers.SignIn)
 }

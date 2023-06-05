@@ -14,7 +14,7 @@ func (instance UserServices) SignUp(user user.User) (*uuid.UUID, error) {
 	return instance.taskRepository.SignUp(user)
 }
 
-func (instance UserServices) SignIn(email string, password string) (*uuid.UUID, error) {
+func (instance UserServices) SignIn(email string, password string) (*string, error) {
 	return instance.taskRepository.SignIn(email, password)
 }
 

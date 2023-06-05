@@ -20,5 +20,5 @@ func TestGetTask(t *testing.T) {
 
 	assert.Equal(t, task.Title(), "Title")
 	assert.Equal(t, task.Description(), "Description")
-	assert.Equal(t, task.Completed(), false)
+	assert.Equal(t, task.Status(), false)
 }

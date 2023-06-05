@@ -14,7 +14,9 @@ type Task struct {
 	ID          uuid.UUID
 	Title       string
 	Description string
-	Completed   bool
+	Category    string
+	Status      bool
+	Date        time.Time
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

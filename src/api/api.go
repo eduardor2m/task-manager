@@ -1,8 +1,12 @@
 package api
 
 import (
+	"net/http"
+
+	"github.com/eduardor2m/task-manager/src/api/middlewares"
 	"github.com/eduardor2m/task-manager/src/api/router"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type API interface {
@@ -29,10 +33,26 @@ func NewApi(options *Options) API {
 
 func (instance *api) Serve() {
 	instance.loadRoutes()
+	instance.echoInstance.Use(instance.getCORSSettings())
 	instance.echoInstance.Logger.Fatal(instance.echoInstance.Start(":9090"))
 }
 
 func (instance *api) loadRoutes() {
 	router := router.New()
 	router.Load(instance.group)
+}
+
+func (instance *api) getCORSSettings() echo.MiddlewareFunc {
+	return middleware.CORSWithConfig(middleware.CORSConfig{
+		Skipper:         middlewares.OriginInspectSkipper,
+		AllowOriginFunc: middlewares.VerifyOrigin,
+		AllowMethods: []string{
+			http.MethodHead,
+			http.MethodGet,
+			http.MethodPost,
+			http.MethodPut,
+			http.MethodDelete,
+			http.MethodPatch,
+		},
+	})
 }

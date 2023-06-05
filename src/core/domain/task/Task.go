@@ -10,7 +10,9 @@ type Task struct {
 	id          uuid.UUID
 	title       string
 	description string
-	completed   bool
+	status      bool
+	category    string
+	date        *time.Time
 	createdAt   *time.Time
 	updatedAt   *time.Time
 }
@@ -27,8 +29,16 @@ func (instance *Task) Description() string {
 	return instance.description
 }
 
-func (instance *Task) Completed() bool {
-	return instance.completed
+func (instance *Task) Category() string {
+	return instance.category
+}
+
+func (instance *Task) Status() bool {
+	return instance.status
+}
+
+func (instance *Task) Date() *time.Time {
+	return instance.date
 }
 
 func (instance *Task) CreatedAt() *time.Time {

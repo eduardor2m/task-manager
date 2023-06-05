@@ -48,8 +48,17 @@ func (instance *builder) WithDescription(description string) *builder {
 	return instance
 }
 
-func (instance *builder) WithCompleted(completed bool) *builder {
-	instance.task.completed = completed
+func (instance *builder) WithCategory(category string) *builder {
+	return instance
+}
+
+func (instance *builder) WithStatus(completed bool) *builder {
+	instance.task.status = completed
+	return instance
+}
+
+func (instance *builder) WithDate(date *time.Time) *builder {
+	instance.task.date = date
 	return instance
 }
 

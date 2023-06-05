@@ -32,8 +32,10 @@ func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task) (*uuid.U
 	taskFormated := bridge.CreateTaskParams{
 		ID:          taskInstance.ID(),
 		Title:       taskInstance.Title(),
+		Category:    taskInstance.Category(),
 		Description: taskInstance.Description(),
-		Completed:   taskInstance.Completed(),
+		Status:      taskInstance.Status(),
+		Date:        *taskInstance.Date(),
 		CreatedAt:   *taskInstance.CreatedAt(),
 		UpdatedAt:   *taskInstance.UpdatedAt(),
 	}
@@ -69,7 +71,7 @@ func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {
 		return nil, err
 	}
 
-	taskInstance, _ := task.NewBuilder().WithID(taskFormated.ID).WithTitle(taskFormated.Title).WithCompleted(taskFormated.Completed).WithCreatedAt(&taskFormated.CreatedAt).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
+	taskInstance, _ := task.NewBuilder().WithID(taskFormated.ID).WithTitle(taskFormated.Title).WithCategory(taskFormated.Category).WithStatus(taskFormated.Status).WithCreatedAt(&taskFormated.CreatedAt).WithDate(&taskFormated.Date).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
 
 	return taskInstance, nil
 }
@@ -96,7 +98,7 @@ func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
 	var tasks []*task.Task
 
 	for _, taskFormated := range tasksFormated {
-		taskInstance, _ := task.NewBuilder().WithID(taskFormated.ID).WithTitle(taskFormated.Title).WithCompleted(taskFormated.Completed).WithCreatedAt(&taskFormated.CreatedAt).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
+		taskInstance, _ := task.NewBuilder().WithID(taskFormated.ID).WithDate(&taskFormated.Date).WithTitle(taskFormated.Title).WithStatus(taskFormated.Status).WithCreatedAt(&taskFormated.CreatedAt).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
 		tasks = append(tasks, taskInstance)
 	}
 
@@ -121,7 +123,7 @@ func (instance TaskSQLiteRepository) UpdateTask(taskInstance task.Task) (*task.T
 		ID:          taskInstance.ID(),
 		Title:       taskInstance.Title(),
 		Description: taskInstance.Description(),
-		Completed:   taskInstance.Completed(),
+		Status:      taskInstance.Status(),
 		UpdatedAt:   *taskInstance.UpdatedAt(),
 	}
 
@@ -131,7 +133,7 @@ func (instance TaskSQLiteRepository) UpdateTask(taskInstance task.Task) (*task.T
 		return nil, err
 	}
 
-	taskUpdated, _ := task.NewBuilder().WithID(taskFormated.ID).WithTitle(taskFormated.Title).WithCompleted(taskFormated.Completed).WithCreatedAt(nil).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
+	taskUpdated, _ := task.NewBuilder().WithID(taskFormated.ID).WithTitle(taskFormated.Title).WithStatus(taskFormated.Status).WithCreatedAt(nil).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
 
 	return taskUpdated, nil
 

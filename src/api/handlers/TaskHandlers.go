@@ -28,7 +28,7 @@ func (instance TaskHandlers) CreateTask(context echo.Context) error {
 
 	currentTime := time.Now()
 
-	taskInstance, err := task.NewBuilder().WithID(uuid.New()).WithTitle(taskRequest.Title).WithCompleted(taskRequest.Completed).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).WithDescription(taskRequest.Description).Build()
+	taskInstance, err := task.NewBuilder().WithID(uuid.New()).WithTitle(taskRequest.Title).WithDate(&currentTime).WithCategory(taskRequest.Category).WithStatus(taskRequest.Status).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).WithDescription(taskRequest.Description).Build()
 
 	if err != nil {
 		errMessage := dto.ErrorMessage{
@@ -84,7 +84,7 @@ func (instance TaskHandlers) UpdateTask(context echo.Context) error {
 
 	currentTime := time.Now()
 
-	taskInstance, err := task.NewBuilder().WithID(id).WithTitle(dataTask.Title).WithCompleted(dataTask.Completed).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).WithDescription(dataTask.Description).Build()
+	taskInstance, err := task.NewBuilder().WithID(id).WithTitle(dataTask.Title).WithCategory(dataTask.Category).WithStatus(dataTask.Status).WithDate(&currentTime).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).WithDescription(dataTask.Description).Build()
 
 	if err != nil {
 		return err
@@ -101,7 +101,9 @@ func (instance TaskHandlers) UpdateTask(context echo.Context) error {
 		ID:          data.ID(),
 		Title:       data.Title(),
 		Description: data.Description(),
-		Completed:   data.Completed(),
+		Category:    data.Category(),
+		Status:      data.Status(),
+		Date:        data.Date(),
 		CreatedAt:   data.CreatedAt(),
 		UpdatedAt:   data.UpdatedAt(),
 	}

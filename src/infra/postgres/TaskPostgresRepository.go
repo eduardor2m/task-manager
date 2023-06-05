@@ -98,7 +98,7 @@ func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
 	var tasks []*task.Task
 
 	for _, taskFormated := range tasksFormated {
-		taskInstance, _ := task.NewBuilder().WithID(taskFormated.ID).WithDate(&taskFormated.Date).WithTitle(taskFormated.Title).WithStatus(taskFormated.Status).WithCreatedAt(&taskFormated.CreatedAt).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
+		taskInstance, _ := task.NewBuilder().WithID(taskFormated.ID).WithDate(&taskFormated.Date).WithCategory(taskFormated.Category).WithTitle(taskFormated.Title).WithStatus(taskFormated.Status).WithCreatedAt(&taskFormated.CreatedAt).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
 		tasks = append(tasks, taskInstance)
 	}
 

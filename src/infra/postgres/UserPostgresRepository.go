@@ -2,8 +2,10 @@ package postgres
 
 import (
 	"context"
-	"fmt"
+	"os"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/eduardor2m/task-manager/src/infra/postgres/bridge"
 
 	"github.com/eduardor2m/task-manager/src/core/domain/user"
@@ -39,8 +41,6 @@ func (instance UserSQLiteRepository) SignUp(userInstance user.User) (*uuid.UUID,
 
 	userDB, err := queries.Signup(ctx, userFormated)
 
-	fmt.Println(err)
-
 	if err != nil {
 		return nil, err
 	}
@@ -73,11 +73,19 @@ func (instance UserSQLiteRepository) SignIn(email string, password string) (*str
 		return nil, err
 	}
 
-	idDB := userDB.ID
+	os.Setenv("ACCESS_SECRET", "jdnfksdmfksd") //this should be in an env file
+	atClaims := jwt.MapClaims{}
+	atClaims["authorized"] = true
+	atClaims["user_id"] = userDB.ID
+	atClaims["exp"] = time.Now().Add(time.Minute * 15).Unix()
+	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
+	token, err := at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
 
-	idDBString := idDB.String()
+	if err != nil {
+		return nil, err
+	}
 
-	return &idDBString, nil
+	return &token, nil
 }
 
 func NewUserSQLiteRepository(connectorManager connectorManager) UserSQLiteRepository {

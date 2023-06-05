@@ -9,6 +9,10 @@ func GetTaskRepository() repository.TaskLoader {
 	return postgres.NewTaskSQLiteRepository(GetSQLiteConnectionManager())
 }
 
+func GetUserRepository() repository.UserLoader {
+	return postgres.NewUserSQLiteRepository(GetSQLiteConnectionManager())
+}
+
 func GetSQLiteConnectionManager() *postgres.DatabaseConnectionManager {
 	return &postgres.DatabaseConnectionManager{}
 }

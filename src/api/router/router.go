@@ -14,4 +14,5 @@ func New() Router {
 
 func (instance *router) Load(group *echo.Group) {
 	loadTaskRoutes(group)
+	loadUserRoutes(group)
 }

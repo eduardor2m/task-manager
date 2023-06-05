@@ -7,3 +7,9 @@ func GetTaskHandlers() *handlers.TaskHandlers {
 		GetTaskServices(),
 	)
 }
+
+func GetUserHandlers() *handlers.UserHandlers {
+	return handlers.NewUserHandlers(
+		GetUserServices(),
+	)
+}

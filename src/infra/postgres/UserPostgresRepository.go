@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"os"
 	"time"
 
@@ -73,19 +74,59 @@ func (instance UserSQLiteRepository) SignIn(email string, password string) (*str
 		return nil, err
 	}
 
-	os.Setenv("ACCESS_SECRET", "jdnfksdmfksd") //this should be in an env file
+	secretKey := os.Getenv("SECRET_KEY")
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
 	atClaims["user_id"] = userDB.ID
-	atClaims["exp"] = time.Now().Add(time.Minute * 15).Unix()
+	atClaims["exp"] = time.Now().Add(time.Second * 30).Unix()
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-	token, err := at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
+	token, err := at.SignedString([]byte(secretKey))
 
 	if err != nil {
 		return nil, err
 	}
 
 	return &token, nil
+}
+
+var (
+	ErrInvalidTokenSignature = errors.New("Assinatura do token inválida")
+	ErrTokenParsingFailed    = errors.New("Falha ao analisar o token JWT")
+	ErrInvalidToken          = errors.New("Token inválido")
+	ErrInvalidTokenClaims    = errors.New("Falha ao obter as reivindicações do token")
+	ErrTokenExpired          = errors.New("Token expirado")
+)
+
+func (instance UserSQLiteRepository) Authorized(token string) (*string, error) {
+	secretKey := os.Getenv("SECRET_KEY")
+	parsedToken, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+		return []byte(secretKey), nil
+	})
+
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			return nil, ErrInvalidTokenSignature
+		}
+		return nil, ErrTokenParsingFailed
+	}
+
+	if !parsedToken.Valid {
+		return nil, ErrInvalidToken
+	}
+
+	claims, ok := parsedToken.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, ErrInvalidTokenClaims
+	}
+
+	expirationTime := time.Unix(int64(claims["exp"].(float64)), 0)
+	if time.Now().After(expirationTime) {
+		return nil, ErrTokenExpired
+	}
+
+	strTokenValid := "Token válido"
+	return &strTokenValid, nil
+
 }
 
 func NewUserSQLiteRepository(connectorManager connectorManager) UserSQLiteRepository {

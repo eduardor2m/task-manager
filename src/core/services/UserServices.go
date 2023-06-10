@@ -18,6 +18,10 @@ func (instance UserServices) SignIn(email string, password string) (*string, err
 	return instance.taskRepository.SignIn(email, password)
 }
 
+func (instance UserServices) Authorized(token string) (*string, error) {
+	return instance.taskRepository.Authorized(token)
+}
+
 func NewUserServices(taskRepository repository.UserLoader) UserServices {
 	return UserServices{taskRepository: taskRepository}
 }

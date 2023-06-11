@@ -34,6 +34,7 @@ func NewApi(options *Options) API {
 func (instance *api) Serve() {
 	instance.loadRoutes()
 	instance.echoInstance.Use(instance.getCORSSettings())
+	instance.echoInstance.Use(middlewares.GuardMiddleware)
 	instance.echoInstance.Logger.Fatal(instance.echoInstance.Start(":9090"))
 }
 

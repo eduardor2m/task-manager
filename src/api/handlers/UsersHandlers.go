@@ -60,14 +60,15 @@ func (instance UserHandlers) Authorized(context echo.Context) error {
 	str, err := instance.service.Authorized(token)
 
 	type structResponse struct {
-		Message string `json:"message"`
+		Message    string `json:"message"`
+		Authorized bool   `json:"authorized"`
 	}
 
 	if err != nil {
-		return context.JSON(400, structResponse{Message: err.Error()})
+		return context.JSON(400, structResponse{Message: err.Error(), Authorized: false})
 	}
 
-	context.JSON(200, structResponse{Message: *str})
+	context.JSON(200, structResponse{Message: *str, Authorized: true})
 
 	return nil
 }

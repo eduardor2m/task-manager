@@ -54,25 +54,6 @@ func (instance UserHandlers) SignIn(context echo.Context) error {
 	return nil
 }
 
-func (instance UserHandlers) Authorized(context echo.Context) error {
-	token := context.Request().Header.Get("Authorization")
-
-	str, err := instance.service.Authorized(token)
-
-	type structResponse struct {
-		Message    string `json:"message"`
-		Authorized bool   `json:"authorized"`
-	}
-
-	if err != nil {
-		return context.JSON(400, structResponse{Message: err.Error(), Authorized: false})
-	}
-
-	context.JSON(200, structResponse{Message: *str, Authorized: true})
-
-	return nil
-}
-
 func NewUserHandlers(service primary.UserManager) *UserHandlers {
 	return &UserHandlers{
 		service: service,

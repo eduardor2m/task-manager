@@ -8,5 +8,4 @@ import (
 type UserManager interface {
 	SignUp(user user.User) (*uuid.UUID, error)
 	SignIn(username, password string) (*string, error)
-	Authorized(token string) (*string, error)
 }

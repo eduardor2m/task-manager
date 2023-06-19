@@ -11,7 +11,9 @@ type Task struct {
 	ID          uuid.UUID  `json:"id"`
 	Title       string     `json:"title"`
 	Description string     `json:"description"`
-	Completed   bool       `json:"completed"`
+	Category    string     `json:"category"`
+	Status      bool       `json:"status"`
+	Date        *time.Time `json:"date"`
 	CreatedAt   *time.Time `json:"createdAt"`
 	UpdatedAt   *time.Time `json:"updatedAt"`
 }
@@ -21,7 +23,9 @@ func NewTask(taskInstance task.Task) *Task {
 		ID:          taskInstance.ID(),
 		Title:       taskInstance.Title(),
 		Description: taskInstance.Description(),
-		Completed:   taskInstance.Completed(),
+		Category:    taskInstance.Category(),
+		Status:      taskInstance.Status(),
+		Date:        taskInstance.Date(),
 		CreatedAt:   taskInstance.CreatedAt(),
 		UpdatedAt:   taskInstance.UpdatedAt(),
 	}

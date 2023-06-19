@@ -14,14 +14,16 @@ import (
 
 const createTask = `-- name: CreateTask :exec
 
-INSERT INTO task (id, title, description, completed, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, title, description, completed, created_at, updated_at
+INSERT INTO task (id, title, description, category, status, date, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, title, description, category, status, date, created_at, updated_at
 `
 
 type CreateTaskParams struct {
 	ID          uuid.UUID
 	Title       string
 	Description string
-	Completed   bool
+	Category    string
+	Status      bool
+	Date        time.Time
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
@@ -31,7 +33,9 @@ func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) error {
 		arg.ID,
 		arg.Title,
 		arg.Description,
-		arg.Completed,
+		arg.Category,
+		arg.Status,
+		arg.Date,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 	)
@@ -60,7 +64,7 @@ func (q *Queries) DeleteTask(ctx context.Context, id uuid.UUID) error {
 
 const getTask = `-- name: GetTask :one
 
-SELECT id, title, description, completed, created_at, updated_at FROM task WHERE id = $1 LIMIT 1
+SELECT id, title, description, category, status, date, created_at, updated_at FROM task WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetTask(ctx context.Context, id uuid.UUID) (Task, error) {
@@ -70,7 +74,9 @@ func (q *Queries) GetTask(ctx context.Context, id uuid.UUID) (Task, error) {
 		&i.ID,
 		&i.Title,
 		&i.Description,
-		&i.Completed,
+		&i.Category,
+		&i.Status,
+		&i.Date,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -79,7 +85,7 @@ func (q *Queries) GetTask(ctx context.Context, id uuid.UUID) (Task, error) {
 
 const getTasks = `-- name: GetTasks :many
 
-SELECT id, title, description, completed, created_at, updated_at FROM task ORDER BY id DESC
+SELECT id, title, description, category, status, date, created_at, updated_at FROM task ORDER BY id DESC
 `
 
 func (q *Queries) GetTasks(ctx context.Context) ([]Task, error) {
@@ -95,7 +101,9 @@ func (q *Queries) GetTasks(ctx context.Context) ([]Task, error) {
 			&i.ID,
 			&i.Title,
 			&i.Description,
-			&i.Completed,
+			&i.Category,
+			&i.Status,
+			&i.Date,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -114,13 +122,13 @@ func (q *Queries) GetTasks(ctx context.Context) ([]Task, error) {
 
 const updateTask = `-- name: UpdateTask :exec
 
-UPDATE task SET title = $1, description = $2, completed = $3, updated_at = $4 WHERE id = $5
+UPDATE task SET title = $1, description = $2, status = $3, updated_at = $4 WHERE id = $5
 `
 
 type UpdateTaskParams struct {
 	Title       string
 	Description string
-	Completed   bool
+	Status      bool
 	UpdatedAt   time.Time
 	ID          uuid.UUID
 }
@@ -129,7 +137,7 @@ func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) error {
 	_, err := q.db.ExecContext(ctx, updateTask,
 		arg.Title,
 		arg.Description,
-		arg.Completed,
+		arg.Status,
 		arg.UpdatedAt,
 		arg.ID,
 	)

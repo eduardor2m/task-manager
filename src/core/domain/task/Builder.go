@@ -48,26 +48,36 @@ func (instance *builder) WithDescription(description string) *builder {
 	return instance
 }
 
-func (instance *builder) WithCompleted(completed bool) *builder {
-	instance.task.completed = completed
+func (instance *builder) WithCategory(category string) *builder {
+	instance.task.category = category
+	return instance
+}
+
+func (instance *builder) WithStatus(completed bool) *builder {
+	instance.task.status = completed
+	return instance
+}
+
+func (instance *builder) WithDate(date *time.Time) *builder {
+	instance.task.date = date
 	return instance
 }
 
 func (instance *builder) WithCreatedAt(createdAt *time.Time) *builder {
-	// if !validator.IsDateValid(*createdAt) {
-	// 	instance.err = errors.New("created at is not valid")
-	// 	return instance
-	// }
+	if !validator.IsDateValid(*createdAt) {
+		instance.err = errors.New("created at is not valid")
+		return instance
+	}
 
 	instance.task.createdAt = createdAt
 	return instance
 }
 
 func (instance *builder) WithUpdatedAt(updatedAt *time.Time) *builder {
-	// if !validator.IsDateValid(*updatedAt) {
-	// 	instance.err = errors.New("updated at is not valid")
-	// 	return instance
-	// }
+	if !validator.IsDateValid(*updatedAt) {
+		instance.err = errors.New("updated at is not valid")
+		return instance
+	}
 
 	instance.task.updatedAt = updatedAt
 	return instance

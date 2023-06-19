@@ -14,7 +14,18 @@ type Task struct {
 	ID          uuid.UUID
 	Title       string
 	Description string
-	Completed   bool
+	Category    string
+	Status      bool
+	Date        time.Time
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+}
+
+type User struct {
+	ID        uuid.UUID
+	Username  string
+	Email     string
+	Password  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

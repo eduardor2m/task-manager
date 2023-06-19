@@ -24,7 +24,7 @@ func (instance MockTaskRepository) GetTask(id uuid.UUID) (*task.Task, error) {
 	taskBuilder := task.NewBuilder()
 	time := time.Now()
 	id = uuid.New()
-	taskDB, _ := taskBuilder.WithID(id).WithTitle("Title").WithDescription("Description").WithCompleted(false).WithCreatedAt(&time).WithUpdatedAt(&time).Build()
+	taskDB, _ := taskBuilder.WithID(id).WithTitle("Title").WithDescription("Description").WithStatus(false).WithCreatedAt(&time).WithUpdatedAt(&time).Build()
 	return taskDB, nil
 }
 

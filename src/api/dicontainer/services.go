@@ -10,3 +10,9 @@ func GetTaskServices() primary.TaskManager {
 		GetTaskRepository(),
 	)
 }
+
+func GetUserServices() primary.UserManager {
+	return services.NewUserServices(
+		GetUserRepository(),
+	)
+}

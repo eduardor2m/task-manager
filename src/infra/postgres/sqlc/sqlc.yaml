@@ -2,7 +2,7 @@ version: 2
 sql:
   - engine: "postgresql"
     schema: "../../../../tools/database/schema.sql"
-    queries: "./queries/task.sql"
+    queries: "./queries/"
     gen:
       go:
         package: "bridge"

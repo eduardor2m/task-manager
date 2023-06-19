@@ -22,27 +22,38 @@ func (dcm DatabaseConnectionManager) getConnection() (*sqlx.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	smtp, err := conn.Prepare(
-		`CREATE TABLE IF NOT EXISTS task (
+
+	// Create the 'task' table
+	_, err = conn.Exec(`
+		CREATE TABLE IF NOT EXISTS task (
 			id UUID PRIMARY KEY,
 			title VARCHAR(255) NOT NULL,
 			description VARCHAR(255) NOT NULL,
-			completed BOOLEAN NOT NULL,
+			category VARCHAR(255) NOT NULL,
+			status BOOLEAN NOT NULL,
+			date TIMESTAMP NOT NULL,
 			created_at TIMESTAMP NOT NULL,
 			updated_at TIMESTAMP NOT NULL
-		)`,
-	)
+		);
+	`)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 
-	_, err = smtp.Exec()
-
+	// Create the 'user' table
+	_, err = conn.Exec(`
+		CREATE TABLE IF NOT EXISTS "user" (
+			id UUID PRIMARY KEY,
+			username VARCHAR(255) NOT NULL,
+			email VARCHAR(255) NOT NULL,
+			password VARCHAR(255) NOT NULL,
+			created_at TIMESTAMP NOT NULL,
+			updated_at TIMESTAMP NOT NULL
+		);
+	`)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
-
-	err = smtp.Close()
 
 	if err != nil {
 		return nil, err

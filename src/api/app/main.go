@@ -7,7 +7,7 @@ import (
 
 func main() {
 	err := godotenv.Load(
-		"/Users/eduardomelo/Documents/projects/my-projects/task-manager/src/api/app/.env",
+		"./src/api/app/.env",
 	)
 	if err != nil {
 		panic(err)

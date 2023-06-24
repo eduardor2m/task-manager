@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/eduardor2m/task-manager/src/api/handlers/dto/request"
+	"github.com/eduardor2m/task-manager/src/api/handlers/dto/response"
 	"github.com/eduardor2m/task-manager/src/core/domain/user"
 	"github.com/eduardor2m/task-manager/src/core/interfaces/primary"
 	"github.com/google/uuid"
@@ -33,7 +34,11 @@ func (instance UserHandlers) SignUp(context echo.Context) error {
 
 	userID, _ := instance.service.SignUp(*userInstance)
 
-	context.JSON(200, userID)
+	idJson := response.ID{
+		ID: *userID,
+	}
+
+	context.JSON(200, idJson)
 
 	return nil
 }
@@ -47,9 +52,13 @@ func (instance UserHandlers) SignIn(context echo.Context) error {
 		context.JSON(400, err)
 	}
 
-	userID, _ := instance.service.SignIn(userRequest.Email, userRequest.Password)
+	token, _ := instance.service.SignIn(userRequest.Email, userRequest.Password)
 
-	context.JSON(200, userID)
+	tokenJson := response.Token{
+		Token: *token,
+	}
+
+	context.JSON(200, tokenJson)
 
 	return nil
 }

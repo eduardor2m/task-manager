@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"strings"
+
 	token "github.com/eduardor2m/task-manager/src/api/handlers/utils"
 	"github.com/labstack/echo/v4"
 )
@@ -16,6 +18,14 @@ func GuardMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if tokenString == "" {
 			return echo.ErrUnauthorized
 		}
+
+		splitToken := strings.Split(tokenString, "Bearer ")
+
+		if len(splitToken) != 2 {
+			return echo.ErrUnauthorized
+		}
+
+		tokenString = splitToken[1]
 
 		token := token.VerifyToken(tokenString)
 

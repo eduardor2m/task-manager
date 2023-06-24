@@ -16,6 +16,14 @@ type User struct {
 	UpdatedAt *time.Time `json:"updatedAt"`
 }
 
+type Token struct {
+	Token string `json:"token"`
+}
+
+type ID struct {
+	ID uuid.UUID `json:"id"`
+}
+
 func NewUser(userInstance user.User) *User {
 	userResponse := &User{
 		ID:        userInstance.ID(),

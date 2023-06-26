@@ -1,6 +1,8 @@
 package postgres
 
 import (
+	"os"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/gommon/log"
 
@@ -17,7 +19,8 @@ var _ connectorManager = (*DatabaseConnectionManager)(nil)
 type DatabaseConnectionManager struct{}
 
 func (dcm DatabaseConnectionManager) getConnection() (*sqlx.DB, error) {
-	connStr := "postgres://root:root@localhost/task-manager-db?sslmode=disable"
+	my_ip := os.Getenv("MY_IP")
+	connStr := "postgres://root:root@" + my_ip + ":5432/task-manager-db?sslmode=disable"
 	conn, err := sqlx.Connect("postgres", connStr)
 	if err != nil {
 		return nil, err

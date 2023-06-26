@@ -1,0 +1,15 @@
+basePath: /api
+info:
+  contact:
+    email: deveduardomelo@gmail.com
+    name: Eduardo Melo
+  description: API para gerenciamento de tarefas
+  title: Task Manager API
+  version: "1.0"
+paths: {}
+securityDefinitions:
+  bearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

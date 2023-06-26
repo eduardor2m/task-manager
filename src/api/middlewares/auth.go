@@ -8,12 +8,19 @@ import (
 )
 
 func GuardMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	// se a rota for api/docs algo, passa
+
 	return func(c echo.Context) error {
+		docsURL := strings.HasPrefix(c.Request().URL.Path, "/api/docs")
 		if c.Request().URL.Path == "/api/user/signin" {
 			return next(c)
 		} else if c.Request().URL.Path == "/api/user/signup" {
 			return next(c)
+
+		} else if docsURL {
+			return next(c)
 		}
+
 		tokenString := c.Request().Header.Get("Authorization")
 		if tokenString == "" {
 			return echo.ErrUnauthorized

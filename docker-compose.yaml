@@ -18,3 +18,10 @@ services:
       - 8080:80
     depends_on:
       - db
+
+  app:
+    image: task-manager
+    ports:
+      - 9090:9090
+    depends_on:
+      - pgadmin

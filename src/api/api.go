@@ -9,6 +9,17 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+// NewAPI
+// @title Task Manager API
+// @version 1.0
+// @description API para gerenciamento de tarefas
+// @contact.name Eduardo Melo
+// @contact.email deveduardomelo@gmail.com
+// @BasePath /api
+// @securityDefinitions.apikey bearerAuth
+// @in header
+// @name Authorization
+
 type API interface {
 	Serve()
 	loadRoutes()

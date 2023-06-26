@@ -17,6 +17,17 @@ type TaskHandlers struct {
 	service primary.TaskManager
 }
 
+// CreateTask
+// @Summary Cria uma nova tarefa
+// @Description Rota para criar uma nova tarefa
+// @Tags Tarefas
+// @Accept json
+// @Produce json
+// @Param taskRequest body request.TaskDTO true "Dados da tarefa a ser criada"
+// @Success 200 {object} uuid.UUID "ID da tarefa criada"
+// @Failure 400 {object} dto.ErrorMessage "Erro na requisição"
+// @Router /tasks [post]
+
 func (instance TaskHandlers) CreateTask(context echo.Context) error {
 	var taskRequest request.TaskDTO
 

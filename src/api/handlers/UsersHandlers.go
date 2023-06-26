@@ -34,7 +34,7 @@ func (instance UserHandlers) SignUp(context echo.Context) error {
 
 	userID, _ := instance.service.SignUp(*userInstance)
 
-	idJson := response.ID{
+	idJson := response.UserID{
 		ID: *userID,
 	}
 
@@ -54,7 +54,7 @@ func (instance UserHandlers) SignIn(context echo.Context) error {
 
 	token, _ := instance.service.SignIn(userRequest.Email, userRequest.Password)
 
-	tokenJson := response.Token{
+	tokenJson := response.UserToken{
 		Token: *token,
 	}
 

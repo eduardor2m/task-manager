@@ -16,11 +16,11 @@ type User struct {
 	UpdatedAt *time.Time `json:"updatedAt"`
 }
 
-type Token struct {
+type UserToken struct {
 	Token string `json:"token"`
 }
 
-type ID struct {
+type UserID struct {
 	ID uuid.UUID `json:"id"`
 }
 

@@ -51,7 +51,11 @@ func (instance TaskHandlers) CreateTask(context echo.Context) error {
 
 	taskID, _ := instance.service.CreateTask(*taskInstance)
 
-	return context.JSON(200, taskID)
+	taskIDJson := response.TaskID{
+		ID: *taskID,
+	}
+
+	return context.JSON(200, taskIDJson)
 }
 
 func (instance TaskHandlers) GetTask(context echo.Context) error {
@@ -132,7 +136,9 @@ func (instance TaskHandlers) DeleteTask(context echo.Context) error {
 		return err
 	}
 
-	message := "Task deleted successfully"
+	message := response.TaskMessage{
+		Message: "Task deleted successfully",
+	}
 
 	return context.JSON(200, message)
 
@@ -145,7 +151,9 @@ func (instance TaskHandlers) DeleteTasks(context echo.Context) error {
 		return err
 	}
 
-	message := "Tasks deleted successfully"
+	message := response.TaskMessage{
+		Message: "Tasks deleted successfully",
+	}
 
 	return context.JSON(200, message)
 }

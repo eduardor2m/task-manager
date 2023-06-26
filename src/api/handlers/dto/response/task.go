@@ -18,6 +18,14 @@ type Task struct {
 	UpdatedAt   *time.Time `json:"updatedAt"`
 }
 
+type TaskID struct {
+	ID uuid.UUID `json:"id"`
+}
+
+type TaskMessage struct {
+	Message string `json:"message"`
+}
+
 func NewTask(taskInstance task.Task) *Task {
 	taskResponse := &Task{
 		ID:          taskInstance.ID(),

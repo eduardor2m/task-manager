@@ -14,6 +14,10 @@ SELECT * FROM task ORDER BY id DESC;
 
 UPDATE task SET title = $1, description = $2, status = $3, updated_at = $4 WHERE id = $5;
 
+-- name: UpdateTaskStatus :exec
+
+UPDATE task SET status = $1, updated_at = $2 WHERE id = $3;
+
 -- name: DeleteTask :exec
 
 DELETE FROM task WHERE id = $1;

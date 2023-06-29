@@ -26,6 +26,10 @@ func (instance TaskServices) UpdateTask(task task.Task) (*task.Task, error) {
 	return instance.taskRepository.UpdateTask(task)
 }
 
+func (instance TaskServices) UpdateTaskStatus(id uuid.UUID) (*task.Task, error) {
+	return instance.taskRepository.UpdateTaskStatus(id)
+}
+
 func (instance TaskServices) DeleteTask(id uuid.UUID) error {
 	return instance.taskRepository.DeleteTask(id)
 }

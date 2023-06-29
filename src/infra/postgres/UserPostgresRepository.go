@@ -77,7 +77,7 @@ func (instance UserSQLiteRepository) SignIn(email string, password string) (*str
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
 	atClaims["user_id"] = userDB.ID
-	atClaims["exp"] = time.Now().Add(time.Second * 180).Unix()
+	atClaims["exp"] = time.Now().Add(time.Second * 500).Unix()
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	token, err := at.SignedString([]byte(secretKey))
 

@@ -127,6 +127,29 @@ func (instance TaskHandlers) UpdateTask(context echo.Context) error {
 
 }
 
+func (instance TaskHandlers) UpdateTaskStatus(context echo.Context) error {
+	id := uuid.MustParse(context.Param("id"))
+
+	data, err := instance.service.UpdateTaskStatus(id)
+
+	if err != nil {
+		return err
+	}
+
+	dataFormatted := response.Task{
+		ID:          data.ID(),
+		Title:       data.Title(),
+		Description: data.Description(),
+		Category:    data.Category(),
+		Status:      data.Status(),
+		Date:        data.Date(),
+		CreatedAt:   data.CreatedAt(),
+		UpdatedAt:   data.UpdatedAt(),
+	}
+
+	return context.JSON(200, dataFormatted)
+}
+
 func (instance TaskHandlers) DeleteTask(context echo.Context) error {
 	id := uuid.MustParse(context.Param("id"))
 

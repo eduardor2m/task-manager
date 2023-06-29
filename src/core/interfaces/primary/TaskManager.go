@@ -10,6 +10,7 @@ type TaskManager interface {
 	GetTask(id uuid.UUID) (*task.Task, error)
 	GetTasks() ([]*task.Task, error)
 	UpdateTask(task task.Task) (*task.Task, error)
+	UpdateTaskStatus(id uuid.UUID) (*task.Task, error)
 	DeleteTask(id uuid.UUID) error
 	DeleteTasks() error
 }

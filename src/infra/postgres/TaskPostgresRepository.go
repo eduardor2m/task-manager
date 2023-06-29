@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	"github.com/eduardor2m/task-manager/src/infra/postgres/bridge"
 
@@ -134,6 +135,54 @@ func (instance TaskSQLiteRepository) UpdateTask(taskInstance task.Task) (*task.T
 	}
 
 	taskUpdated, _ := task.NewBuilder().WithID(taskFormated.ID).WithTitle(taskFormated.Title).WithStatus(taskFormated.Status).WithCreatedAt(nil).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
+
+	return taskUpdated, nil
+
+}
+
+func (instance TaskSQLiteRepository) UpdateTaskStatus(id uuid.UUID) (*task.Task, error) {
+	conn, err := instance.getConnection()
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer instance.closeConnection(conn)
+
+	ctx := context.Background()
+
+	queries := bridge.New(conn)
+
+	taskForUpdate, err := instance.GetTask(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var newStatus bool
+	oldStatus := taskForUpdate.Status()
+
+	if oldStatus {
+		newStatus = false
+	} else {
+		newStatus = true
+	}
+
+	dateUpdated := time.Now()
+
+	taskFormated := bridge.UpdateTaskStatusParams{
+		ID:        id,
+		Status:    newStatus,
+		UpdatedAt: dateUpdated,
+	}
+
+	err = queries.UpdateTaskStatus(ctx, taskFormated)
+
+	if err != nil {
+		return nil, err
+	}
+
+	taskUpdated, _ := instance.GetTask(id)
 
 	return taskUpdated, nil
 

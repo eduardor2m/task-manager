@@ -21,7 +21,10 @@ func (instance UserHandlers) SignUp(context echo.Context) error {
 	err := context.Bind(&userRequest)
 
 	if err != nil {
-		context.JSON(400, err)
+		message := response.TaskMessage{
+			Message: err.Error(),
+		}
+		return context.JSON(400, message)
 	}
 
 	currentTime := time.Now()
@@ -29,10 +32,20 @@ func (instance UserHandlers) SignUp(context echo.Context) error {
 	userInstance, err := user.NewBuilder().WithID(uuid.New()).WithEmail(userRequest.Email).WithPassword(userRequest.Password).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).Build()
 
 	if err != nil {
-		context.JSON(400, err)
+		message := response.TaskMessage{
+			Message: err.Error(),
+		}
+		return context.JSON(400, message)
 	}
 
-	userID, _ := instance.service.SignUp(*userInstance)
+	userID, err := instance.service.SignUp(*userInstance)
+
+	if err != nil {
+		message := response.TaskMessage{
+			Message: err.Error(),
+		}
+		return context.JSON(400, message)
+	}
 
 	idJson := response.UserID{
 		ID: *userID,
@@ -49,10 +62,22 @@ func (instance UserHandlers) SignIn(context echo.Context) error {
 	err := context.Bind(&userRequest)
 
 	if err != nil {
-		context.JSON(400, err)
+		message := response.TaskMessage{
+			Message: err.Error(),
+		}
+		return context.JSON(400, message)
 	}
 
-	token, _ := instance.service.SignIn(userRequest.Email, userRequest.Password)
+	token, err := instance.service.SignIn(userRequest.Email, userRequest.Password)
+
+	if err != nil {
+		message := response.TaskMessage{
+			Message: err.Error(),
+		}
+
+		return context.JSON(400, message)
+
+	}
 
 	tokenJson := response.UserToken{
 		Token: *token,

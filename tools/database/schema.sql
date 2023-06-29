@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS "task"
 CREATE TABLE IF NOT EXISTS "user"
 (
     id          uuid     PRIMARY KEY NOT NULL,
-    username       varchar(255)     NOT NULL,
-    email varchar(255) NOT NULL,
+    username       varchar(255)     NOT NULL UNIQUE,
+    email varchar(255) NOT NULL UNIQUE,
     password   varchar(255) NOT NULL,
     created_at  TIMESTAMP NOT NULL,
     updated_at  TIMESTAMP NOT NULL

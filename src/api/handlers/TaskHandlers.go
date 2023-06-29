@@ -96,8 +96,8 @@ func (instance TaskHandlers) GetTasks(context echo.Context) error {
 }
 
 func (instance TaskHandlers) UpdateTask(context echo.Context) error {
-	dataTask := request.TaskDTO{}
-
+	// Bind the request body to TaskDTO
+	var dataTask request.TaskDTO
 	if err := context.Bind(&dataTask); err != nil {
 		message := response.TaskMessage{
 			Message: err.Error(),
@@ -105,12 +105,28 @@ func (instance TaskHandlers) UpdateTask(context echo.Context) error {
 		return context.JSON(http.StatusBadRequest, message)
 	}
 
-	id := uuid.MustParse(context.Param("id"))
+	// Parse the task ID from the URL parameter
+	id, err := uuid.Parse(context.Param("id"))
+	if err != nil {
+		message := response.TaskMessage{
+			Message: "Invalid task ID",
+		}
+		return context.JSON(http.StatusBadRequest, message)
+	}
 
 	currentTime := time.Now()
 
-	taskInstance, err := task.NewBuilder().WithID(id).WithTitle(dataTask.Title).WithCategory(dataTask.Category).WithStatus(dataTask.Status).WithDate(&currentTime).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).WithDescription(dataTask.Description).Build()
-
+	// Build the task instance using the task builder
+	taskInstance, err := task.NewBuilder().
+		WithID(id).
+		WithTitle(dataTask.Title).
+		WithCategory(dataTask.Category).
+		WithStatus(dataTask.Status).
+		WithDate(&currentTime).
+		WithCreatedAt(&currentTime).
+		WithUpdatedAt(&currentTime).
+		WithDescription(dataTask.Description).
+		Build()
 	if err != nil {
 		message := response.TaskMessage{
 			Message: err.Error(),
@@ -118,28 +134,28 @@ func (instance TaskHandlers) UpdateTask(context echo.Context) error {
 		return context.JSON(http.StatusBadRequest, message)
 	}
 
-	data, err := instance.service.UpdateTask(*taskInstance)
-
+	// Update the task using the service
+	updatedTask, _ := instance.service.UpdateTask(*taskInstance)
 	if err != nil {
 		message := response.TaskMessage{
 			Message: err.Error(),
 		}
-		return context.JSON(http.StatusBadRequest, message)
+		return context.JSON(http.StatusInternalServerError, message)
 	}
 
+	// Format the response
 	dataFormatted := response.Task{
-		ID:          data.ID(),
-		Title:       data.Title(),
-		Description: data.Description(),
-		Category:    data.Category(),
-		Status:      data.Status(),
-		Date:        data.Date(),
-		CreatedAt:   data.CreatedAt(),
-		UpdatedAt:   data.UpdatedAt(),
+		ID:          updatedTask.ID(),
+		Title:       updatedTask.Title(),
+		Description: updatedTask.Description(),
+		Category:    updatedTask.Category(),
+		Status:      updatedTask.Status(),
+		Date:        updatedTask.Date(),
+		CreatedAt:   updatedTask.CreatedAt(),
+		UpdatedAt:   updatedTask.UpdatedAt(),
 	}
 
-	return context.JSON(200, dataFormatted)
-
+	return context.JSON(http.StatusOK, dataFormatted)
 }
 
 func (instance TaskHandlers) UpdateTaskStatus(context echo.Context) error {
@@ -147,11 +163,10 @@ func (instance TaskHandlers) UpdateTaskStatus(context echo.Context) error {
 
 	data, err := instance.service.UpdateTaskStatus(id)
 
-	message := response.TaskMessage{
-		Message: err.Error(),
-	}
-
 	if err != nil {
+		message := response.TaskMessage{
+			Message: err.Error(),
+		}
 		return context.JSON(http.StatusBadRequest, message)
 	}
 
@@ -174,12 +189,11 @@ func (instance TaskHandlers) DeleteTask(context echo.Context) error {
 
 	err := instance.service.DeleteTask(id)
 
-	messageError := response.TaskMessage{
-		Message: err.Error(),
-	}
-
 	if err != nil {
-		return context.JSON(http.StatusBadRequest, messageError)
+		message := response.TaskMessage{
+			Message: err.Error(),
+		}
+		return context.JSON(http.StatusBadRequest, message)
 	}
 
 	message := response.TaskMessage{
@@ -193,12 +207,11 @@ func (instance TaskHandlers) DeleteTask(context echo.Context) error {
 func (instance TaskHandlers) DeleteTasks(context echo.Context) error {
 	err := instance.service.DeleteTasks()
 
-	messageError := response.TaskMessage{
-		Message: err.Error(),
-	}
-
 	if err != nil {
-		return context.JSON(http.StatusBadRequest, messageError)
+		message := response.TaskMessage{
+			Message: err.Error(),
+		}
+		return context.JSON(http.StatusBadRequest, message)
 	}
 
 	message := response.TaskMessage{

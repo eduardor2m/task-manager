@@ -21,6 +21,7 @@ type DatabaseConnectionManager struct{}
 func (dcm DatabaseConnectionManager) getConnection() (*sqlx.DB, error) {
 	my_ip := os.Getenv("MY_IP")
 	connStr := "postgres://root:root@" + my_ip + ":5432/task-manager-db?sslmode=disable"
+
 	conn, err := sqlx.Connect("postgres", connStr)
 	if err != nil {
 		return nil, err

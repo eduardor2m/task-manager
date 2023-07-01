@@ -120,9 +120,9 @@ func (q *Queries) GetTasks(ctx context.Context) ([]Task, error) {
 	return items, nil
 }
 
-const updateTask = `-- name: UpdateTask :exec
+const updateTask = `-- name: UpdateTask :one
 
-UPDATE task SET title = $1, description = $2, status = $3, updated_at = $4 WHERE id = $5
+UPDATE task SET title = $1, description = $2, status = $3, updated_at = $4 WHERE id = $5 RETURNING id, title, description, category, status, date, created_at, updated_at
 `
 
 type UpdateTaskParams struct {
@@ -133,20 +133,31 @@ type UpdateTaskParams struct {
 	ID          uuid.UUID
 }
 
-func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) error {
-	_, err := q.db.ExecContext(ctx, updateTask,
+func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, error) {
+	row := q.db.QueryRowContext(ctx, updateTask,
 		arg.Title,
 		arg.Description,
 		arg.Status,
 		arg.UpdatedAt,
 		arg.ID,
 	)
-	return err
+	var i Task
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Description,
+		&i.Category,
+		&i.Status,
+		&i.Date,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
-const updateTaskStatus = `-- name: UpdateTaskStatus :exec
+const updateTaskStatus = `-- name: UpdateTaskStatus :one
 
-UPDATE task SET status = $1, updated_at = $2 WHERE id = $3
+UPDATE task SET status = $1, updated_at = $2 WHERE id = $3 RETURNING id, title, description, category, status, date, created_at, updated_at
 `
 
 type UpdateTaskStatusParams struct {
@@ -155,7 +166,18 @@ type UpdateTaskStatusParams struct {
 	ID        uuid.UUID
 }
 
-func (q *Queries) UpdateTaskStatus(ctx context.Context, arg UpdateTaskStatusParams) error {
-	_, err := q.db.ExecContext(ctx, updateTaskStatus, arg.Status, arg.UpdatedAt, arg.ID)
-	return err
+func (q *Queries) UpdateTaskStatus(ctx context.Context, arg UpdateTaskStatusParams) (Task, error) {
+	row := q.db.QueryRowContext(ctx, updateTaskStatus, arg.Status, arg.UpdatedAt, arg.ID)
+	var i Task
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Description,
+		&i.Category,
+		&i.Status,
+		&i.Date,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

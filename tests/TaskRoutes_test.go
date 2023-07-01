@@ -12,6 +12,81 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// func createUser() {
+// 	requestUrl := "http://localhost:9090/api/user/signup"
+// 	requestBodyJson := `{
+// 		"username": "test",
+// 		"email": "test@gmail.com",
+// 		"password": "123456"
+// 	}`
+
+// 	requestBodyIo := io.Reader(strings.NewReader(requestBodyJson))
+
+// 	clientRequest, err := http.NewRequest(http.MethodPost, requestUrl, requestBodyIo)
+
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	clientRequest.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+// 	serverResponse, err := http.DefaultClient.Do(clientRequest)
+
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	_, err = io.ReadAll(serverResponse.Body)
+
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// }
+
+// func getToken() string {
+// 	createUser()
+// 	defer deleteUserByEmail("test@gmail.com")
+// 	requestUrl := "http://localhost:9090/api/user/signin"
+// 	requestBodyJson := `{
+// 		"email": "test@gmail.com",
+// 		"password": "123456"
+// 	}`
+
+// 	requestBodyIo := io.Reader(strings.NewReader(requestBodyJson))
+
+// 	clientRequest, err := http.NewRequest(http.MethodPost, requestUrl, requestBodyIo)
+
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	clientRequest.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+// 	serverResponse, err := http.DefaultClient.Do(clientRequest)
+
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	serverData, err := io.ReadAll(serverResponse.Body)
+
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	token := struct {
+// 		Token string `json:"token"`
+// 	}{}
+
+// 	err = json.Unmarshal(serverData, &token)
+
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	return token.Token
+// }
+
 func getToken() string {
 	file, err := os.Open("./data/token.json")
 

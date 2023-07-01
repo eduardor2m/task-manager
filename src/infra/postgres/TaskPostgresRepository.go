@@ -128,15 +128,15 @@ func (instance TaskSQLiteRepository) UpdateTask(taskInstance task.Task) (*task.T
 		UpdatedAt:   *taskInstance.UpdatedAt(),
 	}
 
-	err = queries.UpdateTask(ctx, taskFormated)
+	updatedTask, err := queries.UpdateTask(ctx, taskFormated)
 
 	if err != nil {
 		return nil, err
 	}
 
-	taskUpdated, _ := task.NewBuilder().WithID(taskFormated.ID).WithTitle(taskFormated.Title).WithStatus(taskFormated.Status).WithCreatedAt(nil).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
+	formattedTask, _ := task.NewBuilder().WithID(updatedTask.ID).WithTitle(updatedTask.Title).WithStatus(updatedTask.Status).WithUpdatedAt(&updatedTask.UpdatedAt).WithDescription(updatedTask.Description).WithCategory(updatedTask.Category).WithCreatedAt(&updatedTask.CreatedAt).WithDate(&updatedTask.Date).Build()
 
-	return taskUpdated, nil
+	return formattedTask, nil
 
 }
 
@@ -176,15 +176,19 @@ func (instance TaskSQLiteRepository) UpdateTaskStatus(id uuid.UUID) (*task.Task,
 		UpdatedAt: dateUpdated,
 	}
 
-	err = queries.UpdateTaskStatus(ctx, taskFormated)
+	updatedTask, err := queries.UpdateTaskStatus(ctx, taskFormated)
 
 	if err != nil {
 		return nil, err
 	}
 
-	taskUpdated, _ := instance.GetTask(id)
+	formattedTask, err := task.NewBuilder().WithID(updatedTask.ID).WithTitle(updatedTask.Title).WithStatus(updatedTask.Status).WithUpdatedAt(&updatedTask.UpdatedAt).WithDescription(updatedTask.Description).WithCategory(updatedTask.Category).WithCreatedAt(&updatedTask.CreatedAt).WithDate(&updatedTask.Date).Build()
 
-	return taskUpdated, nil
+	if err != nil {
+		return nil, err
+	}
+
+	return formattedTask, nil
 
 }
 

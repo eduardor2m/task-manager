@@ -10,13 +10,13 @@ SELECT * FROM task WHERE id = $1 LIMIT 1;
 
 SELECT * FROM task ORDER BY id DESC;
 
--- name: UpdateTask :exec
+-- name: UpdateTask :one
 
-UPDATE task SET title = $1, description = $2, status = $3, updated_at = $4 WHERE id = $5;
+UPDATE task SET title = $1, description = $2, status = $3, updated_at = $4 WHERE id = $5 RETURNING *;
 
--- name: UpdateTaskStatus :exec
+-- name: UpdateTaskStatus :one
 
-UPDATE task SET status = $1, updated_at = $2 WHERE id = $3;
+UPDATE task SET status = $1, updated_at = $2 WHERE id = $3 RETURNING *;
 
 -- name: DeleteTask :exec
 

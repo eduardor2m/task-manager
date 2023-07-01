@@ -13,8 +13,6 @@ import (
 )
 
 func getToken() string {
-	// ler arquivo json ./data/token.json e retornar o token {token: "ajfgdfhgdfbhkdfh"}
-
 	file, err := os.Open("./data/token.json")
 
 	if err != nil {
@@ -40,6 +38,34 @@ func getToken() string {
 	}
 
 	return token.Token
+}
+
+func getTaskId() string {
+	file, err := os.Open("./data/taskId.json")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer file.Close()
+
+	fileData, err := io.ReadAll(file)
+
+	if err != nil {
+		panic(err)
+	}
+
+	taskId := struct {
+		Id string `json:"id"`
+	}{}
+
+	err = json.Unmarshal(fileData, &taskId)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return taskId.Id
 }
 
 func TestWhenListAllTasks(t *testing.T) {
@@ -105,6 +131,8 @@ func TestWhenCreateTask(t *testing.T) {
 		t.Error(err)
 	}
 
+	os.WriteFile("./data/taskId.json", serverData, 0666)
+
 	t.Log(string(serverData))
 
 	assert.Equal(t, http.StatusCreated, serverResponse.StatusCode)
@@ -112,7 +140,8 @@ func TestWhenCreateTask(t *testing.T) {
 }
 
 func TestWhenUpdateStatusTask(t *testing.T) {
-	requestUrl := "http://localhost:9090/api/task/d5c7913e-896d-41ce-a295-2dd45b5f827b/status"
+	id := getTaskId()
+	requestUrl := "http://localhost:9090/api/task/" + id + "/status"
 
 	clientRequest, err := http.NewRequest(http.MethodPut, requestUrl, nil)
 

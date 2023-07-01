@@ -28,6 +28,7 @@ func deleteUserByEmail(email string) {
 	token := getToken()
 
 	clientRequest.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+	clientRequest.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 	serverResponse, err := http.DefaultClient.Do(clientRequest)
 
@@ -51,8 +52,6 @@ func TestWhenSignupUser(t *testing.T) {
 		"email": "test@gmail.com",
 		"password": "123456"
 	}`
-
-	defer deleteUserByEmail("test@gmail.com")
 
 	requestBodyIo := io.Reader(strings.NewReader(requestBodyJson))
 

@@ -56,7 +56,7 @@ func (instance TaskHandlers) CreateTask(context echo.Context) error {
 		ID: *taskID,
 	}
 
-	return context.JSON(200, taskIDJson)
+	return context.JSON(http.StatusCreated, taskIDJson)
 }
 
 func (instance TaskHandlers) GetTask(context echo.Context) error {

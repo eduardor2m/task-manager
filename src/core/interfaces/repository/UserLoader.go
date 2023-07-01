@@ -8,4 +8,5 @@ import (
 type UserLoader interface {
 	SignUp(user user.User) (*uuid.UUID, error)
 	SignIn(email string, password string) (*string, error)
+	DeleteUserByEmail(email string) error
 }

@@ -18,6 +18,10 @@ func (instance UserServices) SignIn(email string, password string) (*string, err
 	return instance.taskRepository.SignIn(email, password)
 }
 
+func (instance UserServices) DeleteUserByEmail(email string) error {
+	return instance.taskRepository.DeleteUserByEmail(email)
+}
+
 func NewUserServices(taskRepository repository.UserLoader) UserServices {
 	return UserServices{taskRepository: taskRepository}
 }

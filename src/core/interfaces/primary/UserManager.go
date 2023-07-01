@@ -8,4 +8,5 @@ import (
 type UserManager interface {
 	SignUp(user user.User) (*uuid.UUID, error)
 	SignIn(username, password string) (*string, error)
+	DeleteUserByEmail(email string) error
 }

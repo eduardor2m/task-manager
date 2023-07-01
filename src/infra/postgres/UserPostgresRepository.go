@@ -88,6 +88,26 @@ func (instance UserSQLiteRepository) SignIn(email string, password string) (*str
 	return &token, nil
 }
 
+func (instance UserSQLiteRepository) DeleteUserByEmail(email string) error {
+	conn, err := instance.connectorManager.getConnection()
+	if err != nil {
+		return err
+	}
+	defer instance.connectorManager.closeConnection(conn)
+
+	ctx := context.Background()
+
+	queries := bridge.New(conn)
+
+	_, err = queries.DeleteUserByEmail(ctx, email)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func NewUserSQLiteRepository(connectorManager connectorManager) UserSQLiteRepository {
 	return UserSQLiteRepository{connectorManager: connectorManager}
 }

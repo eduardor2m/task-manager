@@ -12,4 +12,5 @@ func loadUserRoutes(group *echo.Group) {
 
 	userGroup.POST("/signup", userHandlers.SignUp)
 	userGroup.POST("/signin", userHandlers.SignIn)
+	userGroup.DELETE("/delete", userHandlers.DeleteUserByEmail)
 }

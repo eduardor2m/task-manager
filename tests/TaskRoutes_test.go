@@ -1,8 +1,10 @@
 package tests
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 
@@ -11,7 +13,33 @@ import (
 )
 
 func getToken() string {
-	return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2ODgyMzgzMTgsInVzZXJfaWQiOiJmNThmNmI2MC1jZWYyLTQxZGQtYWY4Yi1jYjkyMWYzOGE0MmEifQ.I3ubIZnXXIj2tezFrCHnINzHZHtKO4lA4ZBkqqh8lHI"
+	// ler arquivo json ./data/token.json e retornar o token {token: "ajfgdfhgdfbhkdfh"}
+
+	file, err := os.Open("./data/token.json")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer file.Close()
+
+	fileData, err := io.ReadAll(file)
+
+	if err != nil {
+		panic(err)
+	}
+
+	token := struct {
+		Token string `json:"token"`
+	}{}
+
+	err = json.Unmarshal(fileData, &token)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return token.Token
 }
 
 func TestWhenListAllTasks(t *testing.T) {

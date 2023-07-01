@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/eduardor2m/task-manager/src/api/handlers/dto/request"
@@ -29,7 +30,7 @@ func (instance UserHandlers) SignUp(context echo.Context) error {
 
 	currentTime := time.Now()
 
-	userInstance, err := user.NewBuilder().WithID(uuid.New()).WithEmail(userRequest.Email).WithPassword(userRequest.Password).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).Build()
+	userInstance, err := user.NewBuilder().WithID(uuid.New()).WithUsername(userRequest.Username).WithEmail(userRequest.Email).WithPassword(userRequest.Password).WithCreatedAt(&currentTime).WithUpdatedAt(&currentTime).Build()
 
 	if err != nil {
 		message := response.TaskMessage{
@@ -51,7 +52,7 @@ func (instance UserHandlers) SignUp(context echo.Context) error {
 		ID: *userID,
 	}
 
-	context.JSON(200, idJson)
+	context.JSON(http.StatusCreated, idJson)
 
 	return nil
 }
@@ -86,6 +87,36 @@ func (instance UserHandlers) SignIn(context echo.Context) error {
 	context.JSON(200, tokenJson)
 
 	return nil
+}
+
+func (instance UserHandlers) DeleteUserByEmail(context echo.Context) error {
+	var userRequest request.UserDTO
+
+	err := context.Bind(&userRequest)
+
+	if err != nil {
+		message := response.TaskMessage{
+			Message: err.Error(),
+		}
+
+		return context.JSON(400, message)
+	}
+
+	err = instance.service.DeleteUserByEmail(userRequest.Email)
+
+	if err != nil {
+		message := response.TaskMessage{
+			Message: err.Error(),
+		}
+
+		return context.JSON(400, message)
+	}
+
+	message := response.TaskMessage{
+		Message: "User deleted successfully",
+	}
+
+	return context.JSON(200, message)
 }
 
 func NewUserHandlers(service primary.UserManager) *UserHandlers {

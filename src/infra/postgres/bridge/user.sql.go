@@ -12,6 +12,25 @@ import (
 	"github.com/google/uuid"
 )
 
+const deleteUserByEmail = `-- name: DeleteUserByEmail :one
+
+DELETE FROM "user" WHERE email = $1 RETURNING id, username, email, password, created_at, updated_at
+`
+
+func (q *Queries) DeleteUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRowContext(ctx, deleteUserByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.Password,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const signin = `-- name: Signin :one
 
 SELECT id, username, email, password, created_at, updated_at FROM "user" WHERE email = $1 and password = $2 LIMIT 1

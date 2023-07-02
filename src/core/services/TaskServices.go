@@ -10,16 +10,16 @@ type TaskServices struct {
 	taskRepository repository.TaskLoader
 }
 
-func (instance TaskServices) CreateTask(task task.Task) (*uuid.UUID, error) {
-	return instance.taskRepository.CreateTask(task)
+func (instance TaskServices) CreateTask(task task.Task, token string) (*uuid.UUID, error) {
+	return instance.taskRepository.CreateTask(task, token)
 }
 
 func (instance TaskServices) GetTask(id uuid.UUID) (*task.Task, error) {
 	return instance.taskRepository.GetTask(id)
 }
 
-func (instance TaskServices) GetTasks() ([]*task.Task, error) {
-	return instance.taskRepository.GetTasks()
+func (instance TaskServices) GetTasks(token string) ([]*task.Task, error) {
+	return instance.taskRepository.GetTasks(token)
 }
 
 func (instance TaskServices) UpdateTask(task task.Task) (*task.Task, error) {
@@ -34,8 +34,8 @@ func (instance TaskServices) DeleteTask(id uuid.UUID) error {
 	return instance.taskRepository.DeleteTask(id)
 }
 
-func (instance TaskServices) DeleteTasks() error {
-	return instance.taskRepository.DeleteTasks()
+func (instance TaskServices) DeleteTasks(token string) error {
+	return instance.taskRepository.DeleteTasks(token)
 }
 
 func NewTaskServices(taskRepository repository.TaskLoader) TaskServices {

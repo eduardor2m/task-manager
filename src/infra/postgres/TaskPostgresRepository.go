@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/eduardor2m/task-manager/src/infra/postgres/bridge"
 
 	"github.com/eduardor2m/task-manager/src/core/domain/task"
@@ -17,7 +18,7 @@ type TaskSQLiteRepository struct {
 	connectorManager
 }
 
-func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task) (*uuid.UUID, error) {
+func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task, token string) (*uuid.UUID, error) {
 	db, err := instance.getConnection()
 
 	if err != nil {
@@ -30,7 +31,14 @@ func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task) (*uuid.U
 
 	queries := bridge.New(db)
 
+	userId, err := getUserIdFromToken(token)
+
+	if err != nil {
+		return nil, err
+	}
+
 	taskFormated := bridge.CreateTaskParams{
+		UserID:      userId,
 		ID:          taskInstance.ID(),
 		Title:       taskInstance.Title(),
 		Category:    taskInstance.Category(),
@@ -47,7 +55,8 @@ func (instance TaskSQLiteRepository) CreateTask(taskInstance task.Task) (*uuid.U
 		return nil, err
 	}
 
-	idLastInsert := taskFormated.ID
+	// idLastInsert := taskFormated.
+	idLastInsert := taskFormated.UserID
 
 	return &idLastInsert, nil
 
@@ -77,7 +86,7 @@ func (instance TaskSQLiteRepository) GetTask(id uuid.UUID) (*task.Task, error) {
 	return taskInstance, nil
 }
 
-func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
+func (instance TaskSQLiteRepository) GetTasks(token string) ([]*task.Task, error) {
 	conn, err := instance.getConnection()
 
 	if err != nil {
@@ -90,7 +99,13 @@ func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
 
 	queries := bridge.New(conn)
 
-	tasksFormated, err := queries.GetTasks(ctx)
+	userId, err := getUserIdFromToken(token)
+
+	if err != nil {
+		return nil, err
+	}
+
+	tasksFormated, err := queries.GetTasks(ctx, userId)
 
 	if err != nil {
 		return nil, err
@@ -99,7 +114,7 @@ func (instance TaskSQLiteRepository) GetTasks() ([]*task.Task, error) {
 	var tasks []*task.Task
 
 	for _, taskFormated := range tasksFormated {
-		taskInstance, _ := task.NewBuilder().WithID(taskFormated.ID).WithDate(&taskFormated.Date).WithCategory(taskFormated.Category).WithTitle(taskFormated.Title).WithStatus(taskFormated.Status).WithCreatedAt(&taskFormated.CreatedAt).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
+		taskInstance, _ := task.NewBuilder().WithUserID(taskFormated.UserID).WithID(taskFormated.ID).WithDate(&taskFormated.Date).WithCategory(taskFormated.Category).WithTitle(taskFormated.Title).WithStatus(taskFormated.Status).WithCreatedAt(&taskFormated.CreatedAt).WithUpdatedAt(&taskFormated.UpdatedAt).WithDescription(taskFormated.Description).Build()
 		tasks = append(tasks, taskInstance)
 	}
 
@@ -215,7 +230,7 @@ func (instance TaskSQLiteRepository) DeleteTask(id uuid.UUID) error {
 
 }
 
-func (instance TaskSQLiteRepository) DeleteTasks() error {
+func (instance TaskSQLiteRepository) DeleteTasks(token string) error {
 	conn, err := instance.getConnection()
 
 	if err != nil {
@@ -228,13 +243,41 @@ func (instance TaskSQLiteRepository) DeleteTasks() error {
 
 	queries := bridge.New(conn)
 
-	err = queries.DeleteAllTasks(ctx)
+	userId, err := getUserIdFromToken(token)
+
+	if err != nil {
+		return err
+	}
+
+	err = queries.DeleteAllTasks(ctx, userId)
 
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func getUserIdFromToken(token string) (uuid.UUID, error) {
+	tokenParsed, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+
+	claims := tokenParsed.Claims.(jwt.MapClaims)
+
+	userId := claims["user_id"].(string)
+
+	userIdUUID, err := uuid.Parse(userId)
+
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+
+	return userIdUUID, nil
 }
 
 func NewTaskSQLiteRepository(manager connectorManager) repository.TaskLoader {

@@ -19,6 +19,15 @@ func NewBuilder() *builder {
 	}
 }
 
+func (instance *builder) WithUserID(userID uuid.UUID) *builder {
+	if !validator.IsUUIDValid(userID) {
+		instance.err = errors.New("user id is not valid")
+		return instance
+	}
+	instance.task.userID = userID
+	return instance
+}
+
 func (instance *builder) WithID(id uuid.UUID) *builder {
 	if !validator.IsUUIDValid(id) {
 		instance.err = errors.New("id is not valid")

@@ -12,6 +12,7 @@ import (
 
 type Task struct {
 	ID          uuid.UUID
+	UserID      uuid.UUID
 	Title       string
 	Description string
 	Category    string

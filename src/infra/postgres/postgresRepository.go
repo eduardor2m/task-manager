@@ -27,15 +27,13 @@ func (dcm DatabaseConnectionManager) getConnection() (*sqlx.DB, error) {
 		return nil, err
 	}
 
-	// Create the 'task' table
+	// Create the 'user' table
 	_, err = conn.Exec(`
-		CREATE TABLE IF NOT EXISTS task (
+		CREATE TABLE IF NOT EXISTS "user" (
 			id UUID PRIMARY KEY,
-			title VARCHAR(255) NOT NULL,
-			description VARCHAR(255) NOT NULL,
-			category VARCHAR(255) NOT NULL,
-			status BOOLEAN NOT NULL,
-			date TIMESTAMP NOT NULL,
+			username VARCHAR(255) NOT NULL UNIQUE,
+			email VARCHAR(255) NOT NULL UNIQUE,
+			password VARCHAR(255) NOT NULL,
 			created_at TIMESTAMP NOT NULL,
 			updated_at TIMESTAMP NOT NULL
 		);
@@ -44,13 +42,17 @@ func (dcm DatabaseConnectionManager) getConnection() (*sqlx.DB, error) {
 		log.Fatal(err)
 	}
 
-	// Create the 'user' table
+	// Create the 'task' table
 	_, err = conn.Exec(`
-		CREATE TABLE IF NOT EXISTS "user" (
+		CREATE TABLE IF NOT EXISTS task (
 			id UUID PRIMARY KEY,
-			username VARCHAR(255) NOT NULL UNIQUE,
-			email VARCHAR(255) NOT NULL UNIQUE,
-			password VARCHAR(255) NOT NULL,
+			user_id uuid NOT NULL,
+			FOREIGN KEY (user_id) REFERENCES "user"(id), 
+			title VARCHAR(255) NOT NULL,
+			description VARCHAR(255) NOT NULL,
+			category VARCHAR(255) NOT NULL,
+			status BOOLEAN NOT NULL,
+			date TIMESTAMP NOT NULL,
 			created_at TIMESTAMP NOT NULL,
 			updated_at TIMESTAMP NOT NULL
 		);

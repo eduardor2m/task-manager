@@ -6,11 +6,11 @@ import (
 )
 
 type TaskLoader interface {
-	CreateTask(task task.Task) (*uuid.UUID, error)
+	CreateTask(task task.Task, token string) (*uuid.UUID, error)
 	GetTask(id uuid.UUID) (*task.Task, error)
-	GetTasks() ([]*task.Task, error)
+	GetTasks(token string) ([]*task.Task, error)
 	UpdateTask(task task.Task) (*task.Task, error)
 	UpdateTaskStatus(id uuid.UUID) (*task.Task, error)
 	DeleteTask(id uuid.UUID) error
-	DeleteTasks() error
+	DeleteTasks(token string) error
 }

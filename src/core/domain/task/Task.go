@@ -7,6 +7,7 @@ import (
 )
 
 type Task struct {
+	userID      uuid.UUID
 	id          uuid.UUID
 	title       string
 	description string
@@ -15,6 +16,10 @@ type Task struct {
 	date        *time.Time
 	createdAt   *time.Time
 	updatedAt   *time.Time
+}
+
+func (instance *Task) UserID(userID uuid.UUID) {
+	instance.userID = userID
 }
 
 func (instance *Task) ID() uuid.UUID {

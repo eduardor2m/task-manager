@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS "task"
 (
     id          uuid     PRIMARY KEY NOT NULL,
+    user_id     uuid     NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES "user"(id),
     title       varchar(255)     NOT NULL,
     description varchar(255)     NOT NULL,
     category varchar(255) NOT NULL,

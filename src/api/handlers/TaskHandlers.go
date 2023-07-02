@@ -50,7 +50,11 @@ func (instance TaskHandlers) CreateTask(context echo.Context) error {
 		return context.JSON(http.StatusBadRequest, message)
 	}
 
-	taskID, _ := instance.service.CreateTask(*taskInstance)
+	token := context.Request().Header.Get("Authorization")
+
+	token = token[7:]
+
+	taskID, _ := instance.service.CreateTask(*taskInstance, token)
 
 	taskIDJson := response.TaskID{
 		ID: *taskID,
@@ -77,7 +81,11 @@ func (instance TaskHandlers) GetTask(context echo.Context) error {
 }
 
 func (instance TaskHandlers) GetTasks(context echo.Context) error {
-	listTasks, err := instance.service.GetTasks()
+	token := context.Request().Header.Get("Authorization")
+
+	token = token[7:]
+
+	listTasks, err := instance.service.GetTasks(token)
 
 	if err != nil {
 		message := response.TaskMessage{
@@ -205,7 +213,11 @@ func (instance TaskHandlers) DeleteTask(context echo.Context) error {
 }
 
 func (instance TaskHandlers) DeleteTasks(context echo.Context) error {
-	err := instance.service.DeleteTasks()
+	token := context.Request().Header.Get("Authorization")
+
+	token = token[7:]
+
+	err := instance.service.DeleteTasks(token)
 
 	if err != nil {
 		message := response.TaskMessage{

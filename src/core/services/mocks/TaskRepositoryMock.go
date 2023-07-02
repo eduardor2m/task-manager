@@ -16,7 +16,7 @@ func NewMockTaskRepository() *MockTaskRepository {
 	return &MockTaskRepository{}
 }
 
-func (instance MockTaskRepository) CreateTask(task task.Task) (*uuid.UUID, error) {
+func (instance MockTaskRepository) CreateTask(task task.Task, token string) (*uuid.UUID, error) {
 	return nil, nil
 }
 
@@ -28,7 +28,7 @@ func (instance MockTaskRepository) GetTask(id uuid.UUID) (*task.Task, error) {
 	return taskDB, nil
 }
 
-func (instance MockTaskRepository) GetTasks() ([]*task.Task, error) {
+func (instance MockTaskRepository) GetTasks(token string) ([]*task.Task, error) {
 	return nil, nil
 }
 
@@ -40,6 +40,6 @@ func (instance MockTaskRepository) DeleteTask(id uuid.UUID) error {
 	return nil
 }
 
-func (instance MockTaskRepository) DeleteTasks() error {
+func (instance MockTaskRepository) DeleteTasks(token string) error {
 	return nil
 }

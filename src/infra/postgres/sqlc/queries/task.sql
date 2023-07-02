@@ -1,18 +1,38 @@
 -- name: CreateTask :exec
 
-INSERT INTO task (id, title, description, category, status, date, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;
+INSERT INTO task (
+    user_id,
+    id,
+    title,
+    description,
+    category,
+    status,
+    date,
+    created_at,
+    updated_at
+) VALUES (
+    $1,
+    $2,
+    $3,
+    $4,
+    $5,
+    $6,
+    $7,
+    $8,
+    $9
+) RETURNING *;
 
 -- name: GetTask :one
 
-SELECT * FROM task WHERE id = $1 LIMIT 1;
+SELECT * FROM task WHERE id = $1;
 
 -- name: GetTasks :many
 
-SELECT * FROM task ORDER BY id DESC;
+SELECT * FROM task WHERE user_id = $1 ORDER BY id;
 
 -- name: UpdateTask :one
 
-UPDATE task SET title = $1, description = $2, status = $3, updated_at = $4 WHERE id = $5 RETURNING *;
+UPDATE task SET title = $1, description = $2, category = $3, status = $4, date = $5, updated_at = $6 WHERE id = $7 RETURNING *;
 
 -- name: UpdateTaskStatus :one
 
@@ -24,7 +44,7 @@ DELETE FROM task WHERE id = $1;
 
 -- name: DeleteAllTasks :exec
 
-DELETE FROM task;
+DELETE FROM task WHERE user_id = $1;
 
 
 
